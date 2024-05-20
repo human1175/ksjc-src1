@@ -30,13 +30,13 @@ void line_tracer() {
         // Simple line tracing logic
         if (left1_value == 0 && right1_value == 0) {
             // Move forward
-            Car_Run(i2c_file, 10, 10);
+            Car_Run(i2c_file, 30, 30);
         } else if (left1_value == 0) {
             // Turn left
-            Car_Left(i2c_file, 10, 10);
+            Car_Left(i2c_file, 30, 30);
         } else if (right1_value == 0) {
             // Turn right
-            Car_Right(i2c_file, 10, 10);
+            Car_Right(i2c_file, 30, 30);
         } else {
             // Stop
             Car_Stop(i2c_file);
