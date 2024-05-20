@@ -2,6 +2,7 @@
 #define TRACKING_SENSOR_H
 
 #include <stdint.h>
+#include <wiringPi.h>  // Include wiringPi.h for digitalRead and pinMode functions
 
 #define LEFT1_PIN 27  // Define BCM pin for Left 1
 #define LEFT2_PIN 22  // Define BCM pin for Left 2
