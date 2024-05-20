@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <signal.h>
+#include <wiringPi.h>
+#include <stdlib.h>
 #include "yb_pcb_car.h"
 #include "tracking_sensor.h"
 
