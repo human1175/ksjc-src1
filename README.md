@@ -25,6 +25,8 @@
 shell의 ~/.bashrc 설정 파일에서 alias를 통해 git clone이 일괄적으로 처리될 수 있게 환경을 구성하였다.
 다음 명령어를 이용해 git clone 및 버전 관리를 용이하게 할 수 있다.
 <pre><code>git_folder_fresh</code></pre>
+main함수 컴파일까지 한번에 하고 싶다면 아래의 명령어를 사용할 수 있다.
+<pre><code>git_folder_main</code>
 
 ## Reference
 * GPIO핀에 대한 하드웨어 정보 (http://www.yahboom.net/xiazai/Raspbot/Download/Hardware%20interface%20manual.xlsx)
