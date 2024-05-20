@@ -9,6 +9,11 @@ int main() {
         return -1;
     }
 
+    // Set camera properties
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);  // Set the width of the frames in the video stream.
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480); // Set the height of the frames in the video stream.
+    cap.set(cv::CAP_PROP_FPS, 30);           // Set the frame rate to 30 FPS.
+
     cv::QRCodeDetector qrDecoder = cv::QRCodeDetector();
     cv::Mat frame, bbox, rectifiedImage;
 
