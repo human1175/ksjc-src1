@@ -1,11 +1,21 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <wiringPi.h>
+#include <signal.h>
 #include "yb_pcb_car.h"
 #include "tracking_sensor.h"
 
+int i2c_file;  // Global variable to store the I2C file descriptor
+
+// Signal handler to stop the motors and clean up
+void handle_sigint(int sig) {
+    Car_Stop(i2c_file);
+    close(i2c_file);
+    printf("Motors stopped and I2C file closed. Exiting...\n");
+    exit(0);
+}
+
 // Function to read sensors and control the car accordingly
-void line_tracer(int i2c_file) {
+void line_tracer() {
     while (1) {
         int left1_value = digitalRead(LEFT1_PIN);
         int left2_value = digitalRead(LEFT2_PIN);
@@ -36,15 +46,20 @@ void line_tracer(int i2c_file) {
 
 int main() {
     const char *filename = "/dev/i2c-1";
-    int i2c_file = open_i2c_device(filename);
+    i2c_file = open_i2c_device(filename);
 
     if (i2c_file < 0) {
         return -1;
     }
 
     setup_gpio();
-    line_tracer(i2c_file);
-    Car_Stop(i2c_file);
+
+    // Set up the SIGINT signal handler
+    signal(SIGINT, handle_sigint);
+
+    line_tracer();
+
+    // This point will never be reached due to the infinite loop in line_tracer
     close(i2c_file);
     return 0;
 }
