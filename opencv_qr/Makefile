@@ -1,6 +1,6 @@
 CC = g++
-CFLAGS = `pkg-config --cflags opencv4`
-LDFLAGS = `pkg-config --libs opencv4`
+CFLAGS = -I/usr/local/include/opencv4
+LDFLAGS = -L/usr/local/lib -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_videoio -lopencv_objdetect
 TARGET = qrrecognition
 
 all: $(TARGET)
