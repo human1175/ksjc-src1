@@ -44,7 +44,7 @@ int main() {
 
     setup_gpio();
     line_tracer(i2c_file);
-
+    Car_Stop(i2c_file);
     close(i2c_file);
     return 0;
 }
