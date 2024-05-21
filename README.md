@@ -60,6 +60,13 @@
 * 이외의 컴파일 옵션은 각 소스코드 폴더의 Makefile을 수정하여 적용할 수 있다.
 </br>
 
+## git이 처음인 조원을 위한 팁
+* private repository는 clone과 push, pull과 같은 작업에 보안 때문에 username과 인증 절차를 요구한다.
+* 원래는 username을 입력한 후 비밀번호를 통해 작업이 가능했지만 2021년 8월에 정책이 변경되어 비밀번호를 통한 인증이 차단되었다.
+* 따라서 각자 개인의 고유한 token을 발급받아 인증 절차를 완료할 수 있다.
+* 다음은 토큰을 발급받는 법에 대한 글이다.(https://velog.io/@nara7875/github-%ED%86%A0%ED%81%B0-%EB%B0%9C%EA%B8%89%ED%95%98%EA%B8%B0)
+* 토큰을 발급받은 후 토큰을 이용해 깃허브에서 clone, push, pull과 같은 작업을 하는 방법이다. 다만 나를 제외한 인원은 clone만 사용하기를 권고한다.(https://velog.io/@strombreeding/%EA%B9%83%ED%97%88%EB%B8%8C-Private-repository-clone-%ED%95%98%EB%8A%94%EB%B2%95)
+
 ## Reference
 * GPIO핀에 대한 하드웨어 정보 (http://www.yahboom.net/xiazai/Raspbot/Download/Hardware%20interface%20manual.xlsx)
 * 통신 프로토콜에 대한 정보 (http://www.yahboom.net/xiazai/Raspbot/Download/Pi_MCU_communication_protocol.xlsx)
@@ -69,4 +76,4 @@
 * C에서 C++라이브러리 사용하기 (https://wikidocs.net/114762)
 </br>
  
-#### Updated by JH Choi on May 21, 2024
+#### Updated by JongHyeon Choi on May 21, 2024
