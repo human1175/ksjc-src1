@@ -1,6 +1,7 @@
 </br>
 
-### <div align=center> 시스템 프로그래밍 팀 이름 : [미정]</div>
+### <div align=center> 시스템 프로그래밍 팀 이름 : 十一租 (십일조)</div>
+#### <div align=center> 팀원 : 202011108 신수영, 202011032 김민관, 202211165 장재은, 202211208 최종현</div>
 </br>
 
 ## arduino_code 폴더
