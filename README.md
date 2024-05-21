@@ -66,6 +66,7 @@
 * 공식 사이트 (http://www.yahboom.net/study/Raspbot)
 * Opencv 재설치 관련 영상 (https://www.youtube.com/watch?v=55en3YQtE8s)
 * Opencv 재설치 관련 블로그 (https://make.e4ds.com/make/learn_guide_view.asp?idx=116)
+* C에서 C++라이브러리 사용하기 (https://wikidocs.net/114762)
 </br>
  
 #### Updated by JH Choi on May 21, 2024
