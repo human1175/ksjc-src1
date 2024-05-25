@@ -30,13 +30,13 @@ void line_tracer() {
         // Simple line tracing logic
         if (left1_value == 0 && right1_value == 0) {
             if (left2_value == 1 && right2_value ==1){
-                Car_Run(i2c_file, 20, 20);
+                Car_Run(i2c_file, 60, 60);
             }
             else if (left2_value == 0 && right2_value ==1){
-                Car_Run(i2c_file, 10, 0);
+                Car_Run(i2c_file, 60, 0);
             }
             else if (left2_value == 1 && right2_value ==0){
-                Car_Run(i2c_file, 0, 10);
+                Car_Run(i2c_file, 0, 60);
             }
             else{
                 //4개 다 검정이 인식되는 경우인데, 이런 경우는 발생안하는게 베스트긴함. 일단 비움.
@@ -44,28 +44,28 @@ void line_tracer() {
         }
         else if (left1_value == 0 && right1_value == 1){
             if (left2_value == 0){
-                Car_Run(i2c_file, 20, 0);
+                Car_Run(i2c_file, 60, 0);
             }
             else{
-                Car_Run(i2c_file, 10, 0);
+                Car_Run(i2c_file, 60, 0);
             }
         }
 
         else if (left1_value == 1 && right1_value == 0){
             if (right2_value == 0){
-                Car_Run(i2c_file, 0, 20);
+                Car_Run(i2c_file, 0, 60);
             }
             else{
-                Car_Run(i2c_file, 0, 10);
+                Car_Run(i2c_file, 0, 60);
             }
         }
 
         else if (left1_value == 1 && right1_value == 1){
             if (right2_value == 0){
-                Car_Run(i2c_file, 0, 30);
+                Car_Run(i2c_file, 0, 60);
             }
             else if (left2_value==0){
-                Car_Run(i2c_file, 30, 0);
+                Car_Run(i2c_file, 60, 0);
             }
         }
 
