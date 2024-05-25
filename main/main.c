@@ -23,25 +23,53 @@ void line_tracer() {
         int left2_value = digitalRead(LEFT2_PIN);
         int right1_value = digitalRead(RIGHT1_PIN);
         int right2_value = digitalRead(RIGHT2_PIN);
-
+        
         // Print sensor values for debugging
         printf("Left1: %d, Left2: %d, Right1: %d, Right2: %d\n", left1_value, left2_value, right1_value, right2_value);
 
         // Simple line tracing logic
         if (left1_value == 0 && right1_value == 0) {
-            // Move forward
-            Car_Run(i2c_file, 30, 30);
-        } else if (left1_value == 0) {
-            // Turn left
-            Car_Left(i2c_file, 30, 30);
-        } else if (right1_value == 0) {
-            // Turn right
-            Car_Right(i2c_file, 30, 30);
-        } else {
-            // Stop
-            Car_Stop(i2c_file);
+            if (left2_value == 1 && right2_value ==1){
+                Car_Run(i2c_file, 20, 20);
+            }
+            else if (left2_value == 0 && right2_value ==1){
+                Car_Run(i2c_file, 10, 0);
+            }
+            else if (left2_value == 1 && right2_value ==0){
+                Car_Run(i2c_file, 0, 10);
+            }
+            else{
+                //4개 다 검정이 인식되는 경우인데, 이런 경우는 발생안하는게 베스트긴함. 일단 비움.
+            }
+        }
+        else if (left1_value == 0 && right1_value == 1){
+            if (left2_value == 0){
+                Car_Run(i2c_file, 20, 0);
+            }
+            else{
+                Car_Run(i2c_file, 10, 0);
+            }
         }
 
+        else if (left1_value == 1 && right1_value == 0){
+            if (right2_value == 0){
+                Car_Run(i2c_file, 0, 20);
+            }
+            else{
+                Car_Run(i2c_file, 0, 10);
+            }
+        }
+
+        else if (left1_value == 1 && right1_value == 1){
+            if (right2_value == 0){
+                Car_Run(i2c_file, 0, 30);
+            }
+            else if (left2_value==0){
+                Car_Run(i2c_file, 30, 0);
+            }
+        }
+
+        
         usleep(100000);  // Delay to prevent excessive CPU usage
     }
 }
