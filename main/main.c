@@ -92,7 +92,8 @@ void line_tracer() {
         } else if (left2_value == LOW && right1_value == LOW) {
             // printf("[%ld ms] Moving straight\n", elapsed_time);
             Car_Run(i2c_file, 70, 70);
-
+        }
+        
         usleep(10000);  // Delay to prevent excessive CPU usage
     }
 }
