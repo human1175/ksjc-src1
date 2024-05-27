@@ -90,7 +90,7 @@ void line_tracer() {
 
         // Handle straight line
         } else if (left2_value == LOW && right1_value == LOW) {
-            printf("[%ld ms] Moving straight\n", elapsed_time);
+            // printf("[%ld ms] Moving straight\n", elapsed_time);
             Car_Run(i2c_file, 70, 70);
         }
 
