@@ -3,7 +3,7 @@
 #include <signal.h>
 #include <wiringPi.h>
 #include <stdlib.h>
-#include <time.h>
+#include <sys/time.h>
 #include "yb_pcb_car.h"
 #include "tracking_sensor.h"
 
@@ -113,7 +113,7 @@ int main() {
 
     // Record the start time
     gettimeofday(&start_time, NULL);
-    
+
     line_tracer();
 
     // This point will never be reached due to the infinite loop in line_tracer
