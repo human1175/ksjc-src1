@@ -92,6 +92,11 @@ void line_tracer() {
         } else if (left2_value == LOW && right1_value == LOW) {
             // printf("[%ld ms] Moving straight\n", elapsed_time);
             Car_Run(i2c_file, 70, 70);
+
+        // Handle all sensors detecting white
+        } else if (left1_value == HIGH && left2_value == HIGH && right1_value == HIGH && right2_value == HIGH) {
+            // printf("[%ld ms] All sensors detecting white, stopping\n", elapsed_time);
+            Car_Stop(i2c_file);
         }
 
         usleep(5000);  // Delay to prevent excessive CPU usage
