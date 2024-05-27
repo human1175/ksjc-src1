@@ -7,6 +7,8 @@
 #include "tracking_sensor.h"
 
 int i2c_file;  // Global variable to store the I2C file descriptor
+double previous_error = 0.0;
+double integral = 0.0;
 
 // PID constants
 #define KP 1.0
