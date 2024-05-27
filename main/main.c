@@ -94,7 +94,7 @@ void line_tracer() {
             Car_Run(i2c_file, 70, 70);
         }
 
-        // usleep(5000);  // Delay to prevent excessive CPU usage
+        usleep(5000);  // Delay to prevent excessive CPU usage
     }
 }
 
