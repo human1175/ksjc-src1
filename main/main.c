@@ -52,6 +52,15 @@ void line_tracer() {
         // printf("[%ld ms] Left1: %d, Left2: %d, Right1: %d, Right2: %d\n", elapsed_time, left1_value, left2_value, right1_value, right2_value);
         // printf("[%ld ms] Sensors: %s\n", elapsed_time, sensor_visual);
 
+        // Detect intersection
+        if (left1_value == LOW && left2_value == LOW && right1_value == LOW && right2_value == LOW) {
+            printf("[%ld ms] All ways detected!\n", elapsed_time);
+        } else if (left1_value == LOW && left2_value == LOW && right1_value == LOW && right2_value == HIGH) {
+            printf("[%ld ms] Left way detected!\n", elapsed_time);
+        } else if (left1_value == HIGH && left2_value == LOW && right1_value == LOW && right2_value == LOW) {
+            printf("[%ld ms] Right way detected!\n", elapsed_time);
+        }
+        
         // Implement the logic based on sensor values
         if ((left1_value == LOW || left2_value == LOW) && right2_value == LOW) {
             printf("[%ld ms] Turning right (sharp)\n", elapsed_time);
@@ -93,7 +102,7 @@ void line_tracer() {
             // printf("[%ld ms] Moving straight\n", elapsed_time);
             Car_Run(i2c_file, 70, 70);
         }
-        
+
         usleep(10000);  // Delay to prevent excessive CPU usage
     }
 }
