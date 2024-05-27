@@ -111,6 +111,9 @@ int main() {
     // Set up the SIGINT signal handler
     signal(SIGINT, handle_sigint);
 
+    // Record the start time
+    gettimeofday(&start_time, NULL);
+    
     line_tracer();
 
     // This point will never be reached due to the infinite loop in line_tracer
