@@ -23,6 +23,26 @@ void handle_sigint(int sig) {
     exit(0);
 }
 
+// Function to calculate PID control value
+double calculate_pid(double error) {
+    // Proportional term
+    double P = KP * error;
+
+    // Integral term
+    integral += error;
+    double I = KI * integral;
+
+    // Derivative term
+    double derivative = error - previous_error;
+    double D = KD * derivative;
+
+    // Calculate the control variable
+    double control = P + I + D;
+    previous_error = error;
+
+    return control;
+}
+
 // Function to read sensors and control the car accordingly
 void line_tracer() {
     while (1) {
