@@ -50,7 +50,7 @@ void line_tracer() {
 
         // Print sensor values for debugging
         // printf("[%ld ms] Left1: %d, Left2: %d, Right1: %d, Right2: %d\n", elapsed_time, left1_value, left2_value, right1_value, right2_value);
-        printf("[%ld ms] Sensors: %s\n", elapsed_time, sensor_visual);
+        // printf("[%ld ms] Sensors: %s\n", elapsed_time, sensor_visual);
 
         // Implement the logic based on sensor values
         if ((left1_value == LOW || left2_value == LOW) && right2_value == LOW) {
