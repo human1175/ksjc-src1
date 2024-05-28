@@ -115,7 +115,7 @@ int main() {
     gettimeofday(&start_time, NULL);
 
     // Start QR code recognition in a separate thread or process
-    start_qr_recognition_thread();
+    recognize_qr_code_thread();
 
     line_tracer();
 
