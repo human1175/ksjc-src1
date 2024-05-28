@@ -46,8 +46,8 @@ void line_tracer() {
         int left2_value = digitalRead(LEFT2_PIN);
         int right1_value = digitalRead(RIGHT1_PIN);
         int right2_value = digitalRead(RIGHT2_PIN);
-
-        long elapsed_time = get_elapsed_time(start_time);
+        
+        long elapsed_time = get_elapsed_time();
         char sensor_visual[5];
         visualize_sensor_values(left1_value, left2_value, right1_value, right2_value, sensor_visual);
 
@@ -55,68 +55,58 @@ void line_tracer() {
         // printf("[%ld ms] Left1: %d, Left2: %d, Right1: %d, Right2: %d\n", elapsed_time, left1_value, left2_value, right1_value, right2_value);
         // printf("[%ld ms] Sensors: %s\n", elapsed_time, sensor_visual);
 
-        // Check if all sensors are detecting white
-        if (left1_value == HIGH && left2_value == HIGH && right1_value == HIGH && right2_value == HIGH) {
-            if (!white_detected) {
-                // Start the timer if white detection has just started
-                gettimeofday(&white_start_time, NULL);
-                white_detected = 1;
-            } else {
-                // Check the elapsed time since white detection started
-                long white_elapsed_time = get_elapsed_time(white_start_time);
-                if (white_elapsed_time > 1000) {  // 1 second
-                    printf("[%ld ms] All sensors detecting white for over 1 second, stopping\n", elapsed_time);
-                    Car_Stop(i2c_file);
-                }
-            }
-        } else {
-            // Reset the white detection flag if any sensor detects the line
-            white_detected = 0;
+        // Detect intersection
+        if (left1_value == LOW && left2_value == LOW && right1_value == LOW && right2_value == LOW) {
+            printf("[%ld ms] All ways detected!\n", elapsed_time);
+        } else if (left1_value == LOW && left2_value == LOW && right1_value == LOW && right2_value == HIGH) {
+            printf("[%ld ms] Left way detected!\n", elapsed_time);
+        } else if (left1_value == HIGH && left2_value == LOW && right1_value == LOW && right2_value == LOW) {
+            printf("[%ld ms] Right way detected!\n", elapsed_time);
+        }
+        
+        // Implement the logic based on sensor values
+        if ((left1_value == LOW || left2_value == LOW) && right2_value == LOW) {
+            printf("[%ld ms] Turning right (sharp)\n", elapsed_time);
+            Car_Spin_Right(i2c_file, 70, 30);
+            usleep(200000);  // 0.2 seconds
 
-            // Implement the logic based on sensor values
-            if ((left1_value == LOW || left2_value == LOW) && right2_value == LOW) {
-                printf("[%ld ms] Turning right (sharp)\n", elapsed_time);
-                Car_Spin_Right(i2c_file, 70, 30);
-                usleep(200000);  // 0.2 seconds
+        // Handle sharp and right angles
+        } else if (left1_value == LOW && (right1_value == LOW || right2_value == LOW)) {
+            printf("[%ld ms] Turning left (sharp)\n", elapsed_time);
+            Car_Spin_Left(i2c_file, 30, 70);
+            usleep(200000);  // 0.2 seconds
 
-            // Handle sharp and right angles
-            } else if (left1_value == LOW && (right1_value == LOW || right2_value == LOW)) {
-                printf("[%ld ms] Turning left (sharp)\n", elapsed_time);
-                Car_Spin_Left(i2c_file, 30, 70);
-                usleep(200000);  // 0.2 seconds
+        // Detect most left
+        } else if (left1_value == LOW) {
+            printf("[%ld ms] Turning left\n", elapsed_time);
+            Car_Spin_Left(i2c_file, 70, 70);
+            usleep(50000);  // 0.05 seconds
 
-            // Detect most left
-            } else if (left1_value == LOW) {
-                printf("[%ld ms] Turning left\n", elapsed_time);
-                Car_Spin_Left(i2c_file, 70, 70);
-                usleep(50000);  // 0.05 seconds
+        // Detect most right
+        } else if (right2_value == LOW) {
+            printf("[%ld ms] Turning right\n", elapsed_time);
+            Car_Spin_Right(i2c_file, 70, 70);
+            usleep(50000);  // 0.05 seconds
 
-            // Detect most right
-            } else if (right2_value == LOW) {
-                printf("[%ld ms] Turning right\n", elapsed_time);
-                Car_Spin_Right(i2c_file, 70, 70);
-                usleep(50000);  // 0.05 seconds
+        // Handle small left turn
+        } else if (left2_value == LOW && right1_value == HIGH) {
+            printf("[%ld ms] Adjusting left\n", elapsed_time);
+            Car_Spin_Left(i2c_file, 60, 60);
+            usleep(20000);  // 0.02 seconds
 
-            // Handle small left turn
-            } else if (left2_value == LOW && right1_value == HIGH) {
-                printf("[%ld ms] Adjusting left\n", elapsed_time);
-                Car_Spin_Left(i2c_file, 60, 60);
-                usleep(20000);  // 0.02 seconds
+        // Handle small right turn
+        } else if (left2_value == HIGH && right1_value == LOW) {
+            printf("[%ld ms] Adjusting right\n", elapsed_time);
+            Car_Spin_Right(i2c_file, 60, 60);
+            usleep(20000);  // 0.02 seconds
 
-            // Handle small right turn
-            } else if (left2_value == HIGH && right1_value == LOW) {
-                printf("[%ld ms] Adjusting right\n", elapsed_time);
-                Car_Spin_Right(i2c_file, 60, 60);
-                usleep(20000);  // 0.02 seconds
-
-            // Handle straight line
-            } else if (left2_value == LOW && right1_value == LOW) {
-                // printf("[%ld ms] Moving straight\n", elapsed_time);
-                Car_Run(i2c_file, 70, 70);
-            }
+        // Handle straight line
+        } else if (left2_value == LOW && right1_value == LOW) {
+            // printf("[%ld ms] Moving straight\n", elapsed_time);
+            Car_Run(i2c_file, 70, 70);
         }
 
-        usleep(10000);  // 10 milliseconds delay to prevent excessive CPU usage
+        usleep(10000);  // Delay to prevent excessive CPU usage
     }
 }
 
