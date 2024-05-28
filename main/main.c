@@ -13,8 +13,8 @@ struct timeval start_time;  // Start time of the program
 // Signal handler to stop the motors and clean up
 void handle_sigint(int sig) {
     Car_Stop(i2c_file);
-    close(i2c_file);
-    printf("\n\nMotors stopped and I2C file closed. Exit Complete!\n============================================================\n");
+    close(i2c_file);    
+    printf("\n\n================================================================================\n               Motors stopped and I2C file closed. Exit Complete!\n================================================================================\n\n");
     exit(0);
 }
 

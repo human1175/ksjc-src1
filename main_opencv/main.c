@@ -10,14 +10,12 @@
 
 int i2c_file;  // Global variable to store the I2C file descriptor
 struct timeval start_time;  // Start time of the program
-struct timeval white_start_time;  // Time when all sensors detect white
-int white_detected = 0;  // Flag to indicate if white detection has started
 
 // Signal handler to stop the motors and clean up
 void handle_sigint(int sig) {
     Car_Stop(i2c_file);
     close(i2c_file);
-    printf("\n\nMotors stopped and I2C file closed. Exit Complete!\n============================================================\n");
+    printf("\n\n================================================================================\n               Motors stopped and I2C file closed. Exit Complete!\n================================================================================\n\n");
     exit(0);
 }
 
@@ -46,24 +44,14 @@ void line_tracer() {
         int left2_value = digitalRead(LEFT2_PIN);
         int right1_value = digitalRead(RIGHT1_PIN);
         int right2_value = digitalRead(RIGHT2_PIN);
-        
-        long elapsed_time = get_elapsed_time();
+
+        long elapsed_time = get_elapsed_time(start_time);
         char sensor_visual[5];
         visualize_sensor_values(left1_value, left2_value, right1_value, right2_value, sensor_visual);
 
         // Print sensor values for debugging
-        // printf("[%ld ms] Left1: %d, Left2: %d, Right1: %d, Right2: %d\n", elapsed_time, left1_value, left2_value, right1_value, right2_value);
-        // printf("[%ld ms] Sensors: %s\n", elapsed_time, sensor_visual);
+        printf("[%ld ms] Sensors: %s\n", elapsed_time, sensor_visual);
 
-        // Detect intersection
-        if (left1_value == LOW && left2_value == LOW && right1_value == LOW && right2_value == LOW) {
-            printf("[%ld ms] All ways detected!\n", elapsed_time);
-        } else if (left1_value == LOW && left2_value == LOW && right1_value == LOW && right2_value == HIGH) {
-            printf("[%ld ms] Left way detected!\n", elapsed_time);
-        } else if (left1_value == HIGH && left2_value == LOW && right1_value == LOW && right2_value == LOW) {
-            printf("[%ld ms] Right way detected!\n", elapsed_time);
-        }
-        
         // Implement the logic based on sensor values
         if ((left1_value == LOW || left2_value == LOW) && right2_value == LOW) {
             printf("[%ld ms] Turning right (sharp)\n", elapsed_time);
@@ -102,11 +90,11 @@ void line_tracer() {
 
         // Handle straight line
         } else if (left2_value == LOW && right1_value == LOW) {
-            // printf("[%ld ms] Moving straight\n", elapsed_time);
+            printf("[%ld ms] Moving straight\n", elapsed_time);
             Car_Run(i2c_file, 70, 70);
         }
 
-        usleep(10000);  // Delay to prevent excessive CPU usage
+        usleep(10000);  // 10 milliseconds delay to prevent excessive CPU usage
     }
 }
 
@@ -127,7 +115,7 @@ int main() {
     gettimeofday(&start_time, NULL);
 
     // Start QR code recognition in a separate thread or process
-    recognize_qr_code_thread();
+    start_qr_recognition_thread();
 
     line_tracer();
 
