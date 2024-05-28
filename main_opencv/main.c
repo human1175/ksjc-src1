@@ -140,7 +140,7 @@ int main() {
     // Start QR code recognition in a separate thread or process
     recognize_qr_code_thread();
 
-    // line_tracer();
+    line_tracer();
 
     // This point will never be reached due to the infinite loop in line_tracer
     close(i2c_file);
