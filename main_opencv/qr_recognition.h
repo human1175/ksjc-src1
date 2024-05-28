@@ -1,4 +1,3 @@
-// qr_recognition.h
 #ifndef QR_RECOGNITION_H
 #define QR_RECOGNITION_H
 
@@ -6,7 +5,7 @@
 extern "C" {
 #endif
 
-void recognize_qr_code();
+void recognize_qr_code_thread();
 
 #ifdef __cplusplus
 }

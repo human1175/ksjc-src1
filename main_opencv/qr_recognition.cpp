@@ -3,6 +3,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
+#include <thread>
 
 using namespace cv;
 using namespace std;
@@ -21,7 +22,6 @@ void recognize_qr_code() {
 
     QRCodeDetector qrDecoder = QRCodeDetector();
     Mat frame, bbox, rectifiedImage;
-
     printf("QR code recognition started...\n");
 
     while (true) {
@@ -54,4 +54,8 @@ void recognize_qr_code() {
 
     cap.release();
     destroyAllWindows();
+}
+
+extern "C" void recognize_qr_code_thread() {
+    std::thread(recognize_qr_code).detach();
 }
