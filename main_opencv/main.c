@@ -67,7 +67,6 @@ void line_tracer() {
                 if (white_elapsed_time > 1000) {  // 1 second
                     printf("[%ld ms] All sensors detecting white for over 1 second, stopping\n", elapsed_time);
                     Car_Stop(i2c_file);
-                    break;
                 }
             }
         } else {
