@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Wall -O2 -I/usr/local/include/opencv4
+CFLAGS = -Wall -O3 -I/usr/local/include/opencv4
 LDFLAGS = -L/usr/local/lib -lwiringPi -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_objdetect -lopencv_videoio -pthread
 
 SRC_C = main.c tracking_sensor.c yb_pcb_car.c

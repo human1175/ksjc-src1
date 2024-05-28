@@ -33,7 +33,7 @@ void recognize_qr_code() {
 
         string data = qrDecoder.detectAndDecode(frame, bbox, rectifiedImage);
         if (!data.empty()) {
-            printf("Decoded Data: %s\n", data.c_str());
+            printf("\n============================== QR decoded Data: %s ==============================\n\n", data.c_str());
 
             int n = bbox.rows;
             for (int i = 0; i < n; i++) {
