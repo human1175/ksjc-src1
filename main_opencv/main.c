@@ -46,11 +46,11 @@ void line_tracer() {
         int right2_value = digitalRead(RIGHT2_PIN);
 
         long elapsed_time = get_elapsed_time(start_time);
-        char sensor_visual[5];
-        visualize_sensor_values(left1_value, left2_value, right1_value, right2_value, sensor_visual);
+        // char sensor_visual[5];
+        // visualize_sensor_values(left1_value, left2_value, right1_value, right2_value, sensor_visual);
 
-        // Print sensor values for debugging
-        printf("[%ld ms] Sensors: %s\n", elapsed_time, sensor_visual);
+        // // Print sensor values for debugging
+        // printf("[%ld ms] Sensors: %s\n", elapsed_time, sensor_visual);
 
         // Implement the logic based on sensor values
         if ((left1_value == LOW || left2_value == LOW) && right2_value == LOW) {
