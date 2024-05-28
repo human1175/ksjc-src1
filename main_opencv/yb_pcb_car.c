@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <sys/ioctl.h>
+#include <string.h>
 #include <linux/i2c-dev.h>
 #include <math.h>
 #include "yb_pcb_car.h"
@@ -41,15 +42,25 @@ void write_reg(int file, uint8_t reg) {
     }
 }
 
-void write_array(int file, uint8_t reg, uint8_t *data, size_t length) {
-    uint8_t buffer[length + 1];
-    buffer[0] = reg;
-    for (size_t i = 0; i < length; i++) {
-        buffer[i + 1] = data[i];
-    }
+// void write_array(int file, uint8_t reg, uint8_t *data, size_t length) {
+//     uint8_t buffer[length + 1];
+//     buffer[0] = reg;
+//     for (size_t i = 0; i < length; i++) {
+//         buffer[i + 1] = data[i];
+//     }
 
-    if (write(file, buffer, length + 1) != length + 1) {
-        perror("write_array I2C error");
+//     if (write(file, buffer, length + 1) != length + 1) {
+//         perror("write_array I2C error");
+//     }
+// }
+
+void write_array(int file, uint8_t reg, uint8_t* buffer, size_t length) {
+    uint8_t temp[length + 1];
+    temp[0] = reg;
+    memcpy(&temp[1], buffer, length);
+
+    if (write(file, temp, length + 1) != (ssize_t)(length + 1)) {
+        perror("Failed to write to the i2c bus");
     }
 }
 

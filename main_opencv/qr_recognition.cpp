@@ -1,4 +1,3 @@
-// qr_recognition.cpp
 #include "qr_recognition.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -26,7 +25,9 @@ void recognize_qr_code() {
         string data = qrDecoder.detectAndDecode(frame, bbox, rectifiedImage);
         if (data.length() > 0) {
             printf("Decoded Data: %s\n", data.c_str());
-            imshow("Rectified QRCode", rectifiedImage);
+            if (!rectifiedImage.empty()) {
+                imshow("Rectified QRCode", rectifiedImage);
+            }
         }
 
         imshow("Frame", frame);
