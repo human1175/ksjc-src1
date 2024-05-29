@@ -1,18 +1,19 @@
+
 #include "qr_recognition.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
-#include <pthread.h>
+#include <thread>
 
 using namespace cv;
 using namespace std;
 
-void* recognize_qr_code(void* arg) {
+void recognize_qr_code() {
     VideoCapture cap(0);  // Open the default camera
     if (!cap.isOpened()) {
         printf("Error: Could not open camera.\n");
-        return NULL;
+        return;
     }
 
     // Set camera properties
@@ -54,11 +55,8 @@ void* recognize_qr_code(void* arg) {
 
     cap.release();
     destroyAllWindows();
-    return NULL;
 }
 
 extern "C" void recognize_qr_code_thread() {
-    pthread_t thread_id;
-    pthread_create(&thread_id, NULL, recognize_qr_code, NULL);
-    pthread_detach(thread_id);
+    std::thread(recognize_qr_code).detach();
 }
