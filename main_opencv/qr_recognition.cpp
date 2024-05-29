@@ -48,12 +48,13 @@ void recognize_qr_code() {
                      Scalar(255, 0, 0), 3);
             }
             if (!rectifiedImage.empty()) {
-                imshow("Rectified QRCode", rectifiedImage);
+                imshow("Rectified QRCode", rectifiedImage); // This shows the rectified image if available
                 printf("Rectified QRCode\n");
             }
         }
 
-        imshow("QR Code Detection", frame);
+        // Show grayscale frame with detected QR code bounding box
+        imshow("QR Code Detection", gray_frame);
         if (waitKey(30) >= 0) {
             break;
         }
