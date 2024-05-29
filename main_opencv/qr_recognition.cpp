@@ -3,16 +3,16 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
-#include <thread>
+#include <pthread.h>
 
 using namespace cv;
 using namespace std;
 
-void recognize_qr_code() {
+void* recognize_qr_code(void* arg) {
     VideoCapture cap(0);  // Open the default camera
     if (!cap.isOpened()) {
         printf("Error: Could not open camera.\n");
-        return;
+        return NULL;
     }
 
     // Set camera properties
@@ -54,8 +54,11 @@ void recognize_qr_code() {
 
     cap.release();
     destroyAllWindows();
+    return NULL;
 }
 
 extern "C" void recognize_qr_code_thread() {
-    std::thread(recognize_qr_code).detach();
+    pthread_t thread_id;
+    pthread_create(&thread_id, NULL, recognize_qr_code, NULL);
+    pthread_detach(thread_id);
 }
