@@ -43,12 +43,11 @@ void recognize_qr_code() {
                      Scalar(255, 0, 0), 3);
             }
             if (!rectifiedImage.empty()) {
-                // imshow("Rectified QRCode", rectifiedImage);
-                printf("Rectified QRCode available\n");
+                imshow("Rectified QRCode", rectifiedImage);
             }
         }
 
-        // imshow("QR Code Detection", frame);
+        imshow("QR Code Detection", frame);
         if (waitKey(30) >= 0) {
             break;
         }
