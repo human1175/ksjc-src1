@@ -91,7 +91,7 @@ void line_tracer() {
         // Handle straight line
         } else if (left2_value == LOW && right1_value == LOW) {
             printf("[%ld ms] Moving straight\n", elapsed_time);
-            Car_Run(i2c_file, 70, 70);
+            Car_Run(i2c_file, 120, 120);
         }
 
         usleep(10000);  // 10 milliseconds delay to prevent excessive CPU usage
