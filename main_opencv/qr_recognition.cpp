@@ -1,4 +1,3 @@
-
 #include "qr_recognition.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -17,12 +16,12 @@ void recognize_qr_code() {
     }
 
     // Set camera properties
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, 160);  // Set the width of the frames in the video stream.    640
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 120); // Set the height of the frames in the video stream.   480
-    cap.set(cv::CAP_PROP_FPS, 80);           // Set the frame rate to 30 FPS.
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, 160);  // Set the width of the frames in the video stream.
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 120); // Set the height of the frames in the video stream.
+    cap.set(cv::CAP_PROP_FPS, 80);           // Set the frame rate to 80 FPS.
 
     QRCodeDetector qrDecoder = QRCodeDetector();
-    Mat frame, bbox, rectifiedImage;
+    Mat frame, gray_frame, equalized_frame, bbox, rectifiedImage;
     printf("QR code recognition started...\n");
 
     while (true) {
@@ -32,7 +31,13 @@ void recognize_qr_code() {
             break;
         }
 
-        string data = qrDecoder.detectAndDecode(frame, bbox, rectifiedImage);
+        // Convert to grayscale
+        cvtColor(frame, gray_frame, COLOR_BGR2GRAY);
+
+        // Apply histogram equalization
+        equalizeHist(gray_frame, equalized_frame);
+
+        string data = qrDecoder.detectAndDecode(equalized_frame, bbox, rectifiedImage);
         if (!data.empty()) {
             printf("\n============================== QR decoded Data: %s ==============================\n\n", data.c_str());
 
@@ -44,7 +49,7 @@ void recognize_qr_code() {
             }
             if (!rectifiedImage.empty()) {
                 // imshow("Rectified QRCode", rectifiedImage);
-                printf("Rectified QRCode");
+                printf("Rectified QRCode\n");
             }
         }
 
