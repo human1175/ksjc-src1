@@ -4,9 +4,11 @@
 #include <wiringPi.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <pthread.h>
 #include "yb_pcb_car.h"
 #include "tracking_sensor.h"
 #include "qr_recognition.h"
+#include "client.h"
 
 int i2c_file;  // Global variable to store the I2C file descriptor
 struct timeval start_time;  // Start time of the program
@@ -91,11 +93,16 @@ void line_tracer() {
         // Handle straight line
         } else if (left2_value == LOW && right1_value == LOW) {
             printf("[%ld ms] Moving straight\n", elapsed_time);
-            Car_Run(i2c_file, 120, 120);
+            Car_Run(i2c_file, 70, 70);
         }
 
         usleep(10000);  // 10 milliseconds delay to prevent excessive CPU usage
     }
+}
+
+void* start_client_thread(void* arg) {
+    start_client("127.0.0.1", 8080);  // Replace with actual server IP and port
+    return NULL;
 }
 
 int main() {
@@ -114,9 +121,15 @@ int main() {
     // Record the start time
     gettimeofday(&start_time, NULL);
 
-    // Start QR code recognition in a separate thread or process
+    // Start QR code recognition in a separate thread
     recognize_qr_code_thread();
 
+    // Start client communication in a separate thread
+    pthread_t client_thread;
+    pthread_create(&client_thread, NULL, start_client_thread, NULL);
+    pthread_detach(client_thread);
+
+    // Start line tracing in the main thread
     line_tracer();
 
     // This point will never be reached due to the infinite loop in line_tracer
