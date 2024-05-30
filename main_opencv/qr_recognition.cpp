@@ -4,23 +4,21 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 #include <pthread.h>
-#include "client.h"
-#include "server.h"
 
 using namespace cv;
 using namespace std;
 
-void* recognize_qr_code(void* arg) {
+void recognize_qr_code() {
     VideoCapture cap(0);  // Open the default camera
     if (!cap.isOpened()) {
         printf("Error: Could not open camera.\n");
-        return NULL;
+        return;
     }
 
     // Set camera properties
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, 160);  // Set the width of the frames in the video stream to 160.
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 120); // Set the height of the frames in the video stream to 120.
-    cap.set(cv::CAP_PROP_FPS, 80);           // Set the frame rate to 80 FPS.
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, 160);  // Set the width of the frames in the video stream.
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 120); // Set the height of the frames in the video stream.
+    cap.set(cv::CAP_PROP_FPS, 80);           // Set the frame rate to 30 FPS.
 
     QRCodeDetector qrDecoder = QRCodeDetector();
     Mat frame, bbox, rectifiedImage;
@@ -36,7 +34,6 @@ void* recognize_qr_code(void* arg) {
         string data = qrDecoder.detectAndDecode(frame, bbox, rectifiedImage);
         if (!data.empty()) {
             printf("\n============================== QR decoded Data: %s ==============================\n\n", data.c_str());
-            send_qr_result_to_server(data.c_str());
 
             int n = bbox.rows;
             for (int i = 0; i < n; i++) {
@@ -57,11 +54,13 @@ void* recognize_qr_code(void* arg) {
 
     cap.release();
     destroyAllWindows();
-    return NULL;
 }
 
 extern "C" void recognize_qr_code_thread() {
-    pthread_t thread_id;
-    pthread_create(&thread_id, NULL, recognize_qr_code, NULL);
-    pthread_detach(thread_id);
+    pthread_t qr_thread;
+    pthread_create(&qr_thread, NULL, [](void*) -> void* {
+        recognize_qr_code();
+        return nullptr;
+    }, NULL);
+    pthread_detach(qr_thread);
 }
