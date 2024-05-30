@@ -2,7 +2,7 @@ CC=gcc
 CXX=g++
 CFLAGS=-Wall -O2
 CXXFLAGS=-Wall -O2 `pkg-config --cflags opencv4`
-LDFLAGS=`pkg-config --libs opencv4` -lpthread
+LDFLAGS=`pkg-config --libs opencv4` -lpthread -lwiringPi
 
 OBJS=main.o yb_pcb_car.o tracking_sensor.o client.o qr_recognition.o
 
