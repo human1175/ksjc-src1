@@ -36,6 +36,122 @@ long get_elapsed_time(struct timeval start) {
     return (seconds * 1000) + (microseconds / 1000);
 }
 
+// 서버로부터 받은 client_info를 출력하는 함수
+void print_client_info(client_info *client) {
+    printf("Client Info - Socket: %d, Address: %s, Port: %d, Location: (%d, %d), Score: %d, Bombs: %d\n",
+           client->socket, inet_ntoa(client->address.sin_addr), ntohs(client->address.sin_port), 
+           client->row, client->col, client->score, client->bomb);
+}
+
+// 서버로부터 받은 Status를 출력하는 함수
+void print_status(enum Status status) {
+    const char *status_str[] = {"nothing", "item", "trap"};
+    printf("Status: %s\n", status_str[status]);
+}
+
+// 서버로부터 받은 Item을 출력하는 함수
+void print_item(Item *item) {
+    print_status(item->status);
+    if (item->status == 1) {  // 올바른 비교로 수정
+        printf("Score: %d\n", item->score);
+    }
+}
+
+// 서버로부터 받은 Node를 출력하는 함수
+void print_node(Node *node) {
+    printf("Node - Location: (%d, %d)\n", node->row, node->col);
+    print_item(&(node->item));
+}
+
+// 서버로부터 받은 DGIST를 출력하는 함수
+void print_dgist(DGIST *dgist) {
+    printf("DGIST - Players Info:\n");
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        print_client_info(&(dgist->players[i]));
+    }
+    printf("DGIST - Map Info:\n");
+    for (int i = 0; i < MAP_ROW; i++) {
+        for (int j = 0; j < MAP_COL; j++) {
+            print_node(&(dgist->map[i][j]));
+        }
+    }
+}
+
+// 서버로부터 받은 DGIST 구조체의 players 정보를 출력하는 함수
+void print_players(DGIST *dgist) {
+    printf("==========PRINT PLAYERS==========\n");
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        client_info client = dgist->players[i];
+        printf("++++++++++Player %d++++++++++\n", i + 1);
+        printf("Location: (%d, %d)\n", client.row, client.col);
+        printf("Score: %d\n", client.score);
+        printf("Bomb: %d\n", client.bomb);
+    }
+    printf("==========PRINT DONE==========\n");
+}
+
+// 맵 정보를 출력하는 함수
+void print_map(DGIST *dgist) {
+    printf("==========PRINT MAP==========\n");
+    for (int i = MAP_ROW - 1; i >= 0; i--) {
+        for (int j = 0; j < MAP_COL; j++) {
+            Item tmpItem = (dgist->map[i][j]).item;
+            switch (tmpItem.status) {
+                case nothing:
+                    printf("- ");
+                    break;
+                case item:
+                    printf("%d ", tmpItem.score);
+                    break;
+                case trap:
+                    printf("x ");
+                    break;
+            }
+        }
+        printf("\n");
+    }
+    printf("==========PRINT DONE==========\n");
+}
+
+// 서버로부터 실시간으로 값을 받아와서 출력하는 함수
+void* receive_from_server(void* arg) {
+    int server_sock = *(int*)arg;
+    DGIST dgist;
+
+    while (1) {
+        int valread = read(server_sock, &dgist, sizeof(DGIST));
+        if (valread <= 0) {
+            perror("Read error");
+            break;
+        }
+
+        // 서버로부터 받은 데이터 처리
+        print_players(&dgist);
+        print_map(&dgist);
+    }
+    return NULL;
+}
+
+// QR 코드 인식 콜백 함수
+void qr_code_callback(const char* qr_code_data) {
+    printf("QR Code Recognized: %s\n", qr_code_data);
+
+    // QR 코드 데이터를 두 자리 숫자로 받아서 한 자리씩 나눕니다.
+    if (strlen(qr_code_data) == 2) {
+        // 각 자릿수를 정수로 변환합니다.
+        int digit1 = qr_code_data[0] - '0';
+        int digit2 = qr_code_data[1] - '0';
+
+        // 서버로 각 자릿수를 정수로 전송합니다.
+        send(sock, &digit1, sizeof(int), 0);
+        send(sock, &digit2, sizeof(int), 0);
+        
+        printf("QR code data sent to the server: %d, %d\n", digit1, digit2);
+    } else {
+        printf("Invalid QR code data length: %s\n", qr_code_data);
+    }
+}
+
 // Function to read sensors and control the car accordingly
 void line_tracer() {
     while (1) {
@@ -79,27 +195,6 @@ void line_tracer() {
         usleep(10000);  // 10 milliseconds delay to prevent excessive CPU usage
     }
 }
-
-// QR 코드 인식 콜백 함수
-void qr_code_callback(const char* qr_code_data) {
-    printf("QR Code Recognized: %s\n", qr_code_data);
-
-    // QR 코드 데이터를 두 자리 숫자로 받아서 한 자리씩 나눕니다.
-    if (strlen(qr_code_data) == 2) {
-        // 각 자릿수를 정수로 변환합니다.
-        int digit1 = qr_code_data[0] - '0';
-        int digit2 = qr_code_data[1] - '0';
-
-        // 서버로 각 자릿수를 정수로 전송합니다.
-        send(sock, &digit1, sizeof(int), 0);
-        send(sock, &digit2, sizeof(int), 0);
-        
-        printf("QR code data sent to the server: %d, %d\n", digit1, digit2);
-    } else {
-        printf("Invalid QR code data length: %s\n", qr_code_data);
-    }
-}
-
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
@@ -149,6 +244,10 @@ int main(int argc, char *argv[]) {
     // 시작 시간 기록
     gettimeofday(&start_time, NULL);
 
+    // 서버로부터 값을 받아오는 스레드 생성
+    pthread_t receive_thread;
+    pthread_create(&receive_thread, NULL, receive_from_server, &sock);
+
     // QR 코드 인식과 전송을 별도의 스레드에서 시작
     recognize_qr_code_thread(qr_code_callback);
 
@@ -156,6 +255,7 @@ int main(int argc, char *argv[]) {
     line_tracer();
 
     // 이 지점은 line_tracer의 무한 루프 때문에 도달하지 않음
+    pthread_join(receive_thread, NULL);
     close(i2c_file);
     close(sock);
     return 0;
