@@ -94,7 +94,7 @@ void recognize_qr_code(int sock) {
             // QR 코드 데이터를 파싱하여 row와 col 값으로 변환
             ClientAction action;
             sscanf(data.c_str(), "%1d%1d", &action.row, &action.col);
-            action.action = move; // 기본 동작 설정
+            action.action = Action::move; // 기본 동작 설정
 
             send_client_action(sock, &action);
 
