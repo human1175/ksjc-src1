@@ -4,17 +4,24 @@
 #include <wiringPi.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <pthread.h>
+#include <arpa/inet.h>
 #include "yb_pcb_car.h"
 #include "tracking_sensor.h"
 #include "qr_recognition.h"
+#include "server.h"
+
+#define SERVER_IP "127.0.0.1" // 고정된 서버 IP 주소
 
 int i2c_file;  // Global variable to store the I2C file descriptor
 struct timeval start_time;  // Start time of the program
+int sock;  // 소켓 파일 디스크립터
 
 // Signal handler to stop the motors and clean up
 void handle_sigint(int sig) {
     Car_Stop(i2c_file);
     close(i2c_file);
+    close(sock);
     printf("\n\n================================================================================\n               Motors stopped and I2C file closed. Exit Complete!\n================================================================================\n\n");
     exit(0);
 }
@@ -28,15 +35,6 @@ long get_elapsed_time(struct timeval start) {
     return (seconds * 1000) + (microseconds / 1000);
 }
 
-// Function to visualize sensor values
-void visualize_sensor_values(int left1, int left2, int right1, int right2, char* buffer) {
-    buffer[0] = left1 == LOW ? '|' : ' ';
-    buffer[1] = left2 == LOW ? '|' : ' ';
-    buffer[2] = right1 == LOW ? '|' : ' ';
-    buffer[3] = right2 == LOW ? '|' : ' ';
-    buffer[4] = '\0';
-}
-
 // Function to read sensors and control the car accordingly
 void line_tracer() {
     while (1) {
@@ -46,49 +44,32 @@ void line_tracer() {
         int right2_value = digitalRead(RIGHT2_PIN);
 
         long elapsed_time = get_elapsed_time(start_time);
-        // char sensor_visual[5];
-        // visualize_sensor_values(left1_value, left2_value, right1_value, right2_value, sensor_visual);
 
-        // // Print sensor values for debugging
-        // printf("[%ld ms] Sensors: %s\n", elapsed_time, sensor_visual);
-
-        // Implement the logic based on sensor values
-        if ((left1_value == LOW || left2_value == LOW) && right2_value == LOW) {
-            printf("[%ld ms] Turning right (sharp)\n", elapsed_time);
-            Car_Spin_Right(i2c_file, 70, 30);
-            usleep(200000);  // 0.2 seconds
-
-        // Handle sharp and right angles
-        } else if (left1_value == LOW && (right1_value == LOW || right2_value == LOW)) {
+        if (left1_value == LOW && right2_value == LOW) {
             printf("[%ld ms] Turning left (sharp)\n", elapsed_time);
             Car_Spin_Left(i2c_file, 30, 70);
             usleep(200000);  // 0.2 seconds
 
-        // Detect most left
         } else if (left1_value == LOW) {
             printf("[%ld ms] Turning left\n", elapsed_time);
             Car_Spin_Left(i2c_file, 70, 70);
             usleep(50000);  // 0.05 seconds
 
-        // Detect most right
         } else if (right2_value == LOW) {
             printf("[%ld ms] Turning right\n", elapsed_time);
             Car_Spin_Right(i2c_file, 70, 70);
             usleep(50000);  // 0.05 seconds
 
-        // Handle small left turn
         } else if (left2_value == LOW && right1_value == HIGH) {
             printf("[%ld ms] Adjusting left\n", elapsed_time);
             Car_Spin_Left(i2c_file, 60, 60);
             usleep(20000);  // 0.02 seconds
 
-        // Handle small right turn
         } else if (left2_value == HIGH && right1_value == LOW) {
             printf("[%ld ms] Adjusting right\n", elapsed_time);
             Car_Spin_Right(i2c_file, 60, 60);
             usleep(20000);  // 0.02 seconds
 
-        // Handle straight line
         } else if (left2_value == LOW && right1_value == LOW) {
             printf("[%ld ms] Moving straight\n", elapsed_time);
             Car_Run(i2c_file, 120, 120);
@@ -98,7 +79,56 @@ void line_tracer() {
     }
 }
 
-int main() {
+// QR 코드 인식을 수행하고 결과를 서버로 전송하는 함수
+void* recognize_and_send_qr_code(void* arg) {
+    while (1) {
+        // QR 코드 인식을 수행하고 결과를 얻습니다.
+        char qr_code_data[100];
+        if (recognize_qr_code(qr_code_data, sizeof(qr_code_data))) {
+            printf("QR Code Recognized: %s\n", qr_code_data);
+
+            // 서버로 QR 코드 데이터를 전송합니다.
+            send(sock, qr_code_data, strlen(qr_code_data), 0);
+            printf("QR code data sent to the server.\n");
+        }
+        usleep(500000);  // 0.5 seconds delay between QR code recognition attempts
+    }
+    return NULL;
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <port>\n", argv[0]);
+        return 1;
+    }
+
+    int port = atoi(argv[1]);
+    struct sockaddr_in server_addr;
+
+    // 소켓 생성
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        perror("Socket creation error");
+        return -1;
+    }
+
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(port);
+
+    // 서버 IP 주소 설정
+    if (inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr) <= 0) {
+        perror("Invalid address / Address not supported");
+        return -1;
+    }
+
+    // 서버에 연결
+    if (connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        perror("Connection failed");
+        return -1;
+    }
+
+    printf("Connected to the server.\n");
+
+    // I2C 장치 열기
     const char *filename = "/dev/i2c-1";
     i2c_file = open_i2c_device(filename);
 
@@ -108,18 +138,20 @@ int main() {
 
     setup_gpio();
 
-    // Set up the SIGINT signal handler
+    // SIGINT 신호 핸들러 설정
     signal(SIGINT, handle_sigint);
 
-    // Record the start time
+    // 시작 시간 기록
     gettimeofday(&start_time, NULL);
 
-    // Start QR code recognition in a separate thread or process
+    // QR 코드 인식과 전송을 별도의 스레드에서 시작
     recognize_qr_code_thread();
 
+    // 라인 트레이서 기능 시작
     line_tracer();
 
-    // This point will never be reached due to the infinite loop in line_tracer
+    // 이 지점은 line_tracer의 무한 루프 때문에 도달하지 않음
     close(i2c_file);
+    close(sock);
     return 0;
 }
