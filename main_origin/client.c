@@ -15,7 +15,7 @@ void print_client_info(client_info *client) {
 }
 
 // 서버로부터 받은 Status를 출력하는 함수
-void print_status(Status status) {
+void print_status(enum Status status) {
     const char *status_str[] = {"nothing", "item", "trap"};
     printf("Status: %s\n", status_str[status]);
 }
