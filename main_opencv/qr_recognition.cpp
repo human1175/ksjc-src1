@@ -3,25 +3,26 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
-#include <thread>
+#include <pthread.h>
+#include "client.h"
 
 using namespace cv;
 using namespace std;
 
-void recognize_qr_code() {
+void* recognize_qr_code(void* arg) {
     VideoCapture cap(0);  // Open the default camera
     if (!cap.isOpened()) {
         printf("Error: Could not open camera.\n");
-        return;
+        return NULL;
     }
 
     // Set camera properties
     cap.set(cv::CAP_PROP_FRAME_WIDTH, 160);  // Set the width of the frames in the video stream.
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, 120); // Set the height of the frames in the video stream.
-    cap.set(cv::CAP_PROP_FPS, 80);           // Set the frame rate to 80 FPS.
+    cap.set(cv::CAP_PROP_FPS, 80);           // Set the frame rate to 30 FPS.
 
     QRCodeDetector qrDecoder = QRCodeDetector();
-    Mat frame, gray_frame, equalized_frame, bbox, rectifiedImage;
+    Mat frame, bbox, rectifiedImage;
     printf("QR code recognition started...\n");
 
     while (true) {
@@ -31,15 +32,10 @@ void recognize_qr_code() {
             break;
         }
 
-        // Convert to grayscale
-        cvtColor(frame, gray_frame, COLOR_BGR2GRAY);
-
-        // Apply histogram equalization
-        equalizeHist(gray_frame, equalized_frame);
-
-        string data = qrDecoder.detectAndDecode(equalized_frame, bbox, rectifiedImage);
+        string data = qrDecoder.detectAndDecode(frame, bbox, rectifiedImage);
         if (!data.empty()) {
             printf("\n============================== QR decoded Data: %s ==============================\n\n", data.c_str());
+            send_qr_result_to_server(data.c_str());
 
             int n = bbox.rows;
             for (int i = 0; i < n; i++) {
@@ -48,13 +44,11 @@ void recognize_qr_code() {
                      Scalar(255, 0, 0), 3);
             }
             if (!rectifiedImage.empty()) {
-                // imshow("Rectified QRCode", rectifiedImage); // This shows the rectified image if available
-                printf("Rectified QRCode\n");
+                // imshow("Rectified QRCode", rectifiedImage);
             }
         }
 
-        // Show grayscale frame with detected QR code bounding box
-        // imshow("QR Code Detection", gray_frame);
+        // imshow("QR Code Detection", frame);
         if (waitKey(30) >= 0) {
             break;
         }
@@ -62,8 +56,11 @@ void recognize_qr_code() {
 
     cap.release();
     destroyAllWindows();
+    return NULL;
 }
 
 extern "C" void recognize_qr_code_thread() {
-    std::thread(recognize_qr_code).detach();
+    pthread_t thread_id;
+    pthread_create(&thread_id, NULL, recognize_qr_code, NULL);
+    pthread_detach(thread_id);
 }

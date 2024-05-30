@@ -8,6 +8,12 @@ extern "C" {
 // Function to start the client and connect to the server
 void start_client(const char *server_ip, int server_port);
 
+// Function to send QR result to the server
+void send_qr_result_to_server(const char* qr_result);
+
+// Thread function to receive data from the server
+void* receive_data_from_server(void* arg);
+
 #ifdef __cplusplus
 }
 #endif

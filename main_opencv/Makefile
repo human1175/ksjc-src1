@@ -5,7 +5,7 @@ LDFLAGS = -L/usr/local/lib -lwiringPi -lopencv_core -lopencv_imgproc -lopencv_hi
 SRC_C = main.c tracking_sensor.c yb_pcb_car.c client.c
 SRC_CPP = qr_recognition.cpp
 OBJ_C = $(SRC_C:.c=.o)
-OBJ_CPP = $(SRC_CPP:.cpp=.o)
+OBJ_CPP = $(SRC_CPP:.cpp:.o)
 OBJ = $(OBJ_C) $(OBJ_CPP)
 
 TARGET = robot
