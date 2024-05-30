@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-void recognize_qr_code(int sock);
+void start_qr_recognition(int sock);
 
 #ifdef __cplusplus
 }
