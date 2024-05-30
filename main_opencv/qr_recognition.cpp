@@ -5,6 +5,7 @@
 #include <opencv2/objdetect/objdetect.hpp>
 #include <pthread.h>
 #include "client.h"
+#include "server.h"
 
 using namespace cv;
 using namespace std;
@@ -17,9 +18,9 @@ void* recognize_qr_code(void* arg) {
     }
 
     // Set camera properties
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, 160);  // Set the width of the frames in the video stream.
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 120); // Set the height of the frames in the video stream.
-    cap.set(cv::CAP_PROP_FPS, 80);           // Set the frame rate to 30 FPS.
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, 160);  // Set the width of the frames in the video stream to 160.
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 120); // Set the height of the frames in the video stream to 120.
+    cap.set(cv::CAP_PROP_FPS, 80);           // Set the frame rate to 80 FPS.
 
     QRCodeDetector qrDecoder = QRCodeDetector();
     Mat frame, bbox, rectifiedImage;
@@ -44,11 +45,11 @@ void* recognize_qr_code(void* arg) {
                      Scalar(255, 0, 0), 3);
             }
             if (!rectifiedImage.empty()) {
-                // imshow("Rectified QRCode", rectifiedImage);
+                imshow("Rectified QRCode", rectifiedImage);
             }
         }
 
-        // imshow("QR Code Detection", frame);
+        imshow("QR Code Detection", frame);
         if (waitKey(30) >= 0) {
             break;
         }

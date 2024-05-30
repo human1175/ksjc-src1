@@ -5,17 +5,14 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <pthread.h>
-#include "qr_recognition.h"
+#include "server.h"
 
 // Global variables for client
 int client_socket;
 pthread_mutex_t socket_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-// Function to start the client and connect to the server
 void start_client(const char *server_ip, int server_port) {
     struct sockaddr_in server_addr;
-    char buffer[1024];
-    int n;
 
     // Create socket
     if ((client_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -47,6 +44,7 @@ void start_client(const char *server_ip, int server_port) {
     pthread_create(&recv_thread, NULL, receive_data_from_server, NULL);
 
     // Communication loop
+    char buffer[1024];
     while (1) {
         fgets(buffer, sizeof(buffer), stdin);
         send(client_socket, buffer, strlen(buffer), 0);
@@ -56,12 +54,12 @@ void start_client(const char *server_ip, int server_port) {
 }
 
 void* receive_data_from_server(void* arg) {
-    char buffer[1024];
+    DGIST dgist;
     int n;
 
-    while ((n = recv(client_socket, buffer, sizeof(buffer) - 1, 0)) > 0) {
-        buffer[n] = '\0';
-        printf("Server: %s\n", buffer);
+    while ((n = recv(client_socket, &dgist, sizeof(DGIST), 0)) > 0) {
+        printf("Received data from server\n");
+        print_dgist(&dgist);
     }
 
     if (n == 0) {
@@ -75,7 +73,35 @@ void* receive_data_from_server(void* arg) {
 }
 
 void send_qr_result_to_server(const char* qr_result) {
+    ClientAction action;
+    sscanf(qr_result, "%1d%1d", &action.row, &action.col);
+    action.action = move;
+
     pthread_mutex_lock(&socket_mutex);
-    send(client_socket, qr_result, strlen(qr_result), 0);
+    send(client_socket, &action, sizeof(ClientAction), 0);
     pthread_mutex_unlock(&socket_mutex);
+}
+
+void print_dgist(DGIST* dgist) {
+    printf("========== Players Information ==========\n");
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        printf("Player %d: Row: %d, Col: %d, Score: %d, Bombs: %d\n",
+            i + 1,
+            dgist->players[i].row,
+            dgist->players[i].col,
+            dgist->players[i].score,
+            dgist->players[i].bomb);
+    }
+
+    printf("========== Map Information ==========\n");
+    for (int i = 0; i < MAP_ROW; i++) {
+        for (int j = 0; j < MAP_COL; j++) {
+            Node* node = &dgist->map[i][j];
+            printf("Node (%d, %d): Status: %d, Score: %d\n",
+                node->row,
+                node->col,
+                node->item.status,
+                node->item.score);
+        }
+    }
 }

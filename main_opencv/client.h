@@ -14,6 +14,9 @@ void send_qr_result_to_server(const char* qr_result);
 // Thread function to receive data from the server
 void* receive_data_from_server(void* arg);
 
+// Function to print the DGIST structure
+void print_dgist(DGIST* dgist);
+
 #ifdef __cplusplus
 }
 #endif
