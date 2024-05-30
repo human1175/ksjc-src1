@@ -6,6 +6,7 @@
 #include <sys/time.h>
 #include <pthread.h>
 #include <arpa/inet.h>
+#include <cstring>
 #include "yb_pcb_car.h"
 #include "tracking_sensor.h"
 #include "qr_recognition.h"
