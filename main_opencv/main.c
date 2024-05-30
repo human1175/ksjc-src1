@@ -48,11 +48,6 @@ void line_tracer() {
         int right2_value = digitalRead(RIGHT2_PIN);
 
         long elapsed_time = get_elapsed_time(start_time);
-        // char sensor_visual[5];
-        // visualize_sensor_values(left1_value, left2_value, right1_value, right2_value, sensor_visual);
-
-        // // Print sensor values for debugging
-        // printf("[%ld ms] Sensors: %s\n", elapsed_time, sensor_visual);
 
         // Implement the logic based on sensor values
         if ((left1_value == LOW || left2_value == LOW) && right2_value == LOW) {
@@ -60,37 +55,31 @@ void line_tracer() {
             Car_Spin_Right(i2c_file, 70, 30);
             usleep(200000);  // 0.2 seconds
 
-        // Handle sharp and right angles
         } else if (left1_value == LOW && (right1_value == LOW || right2_value == LOW)) {
             printf("[%ld ms] Turning left (sharp)\n", elapsed_time);
             Car_Spin_Left(i2c_file, 30, 70);
             usleep(200000);  // 0.2 seconds
 
-        // Detect most left
         } else if (left1_value == LOW) {
             printf("[%ld ms] Turning left\n", elapsed_time);
             Car_Spin_Left(i2c_file, 70, 70);
             usleep(50000);  // 0.05 seconds
 
-        // Detect most right
         } else if (right2_value == LOW) {
             printf("[%ld ms] Turning right\n", elapsed_time);
             Car_Spin_Right(i2c_file, 70, 70);
             usleep(50000);  // 0.05 seconds
 
-        // Handle small left turn
         } else if (left2_value == LOW && right1_value == HIGH) {
             printf("[%ld ms] Adjusting left\n", elapsed_time);
             Car_Spin_Left(i2c_file, 60, 60);
             usleep(20000);  // 0.02 seconds
 
-        // Handle small right turn
         } else if (left2_value == HIGH && right1_value == LOW) {
             printf("[%ld ms] Adjusting right\n", elapsed_time);
             Car_Spin_Right(i2c_file, 60, 60);
             usleep(20000);  // 0.02 seconds
 
-        // Handle straight line
         } else if (left2_value == LOW && right1_value == LOW) {
             printf("[%ld ms] Moving straight\n", elapsed_time);
             Car_Run(i2c_file, 70, 70);

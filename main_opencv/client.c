@@ -14,7 +14,7 @@ void start_client(const char *server_ip, int server_port) {
     // Create socket
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("Socket creation error");
-        exit(EXIT_FAILURE);
+        return;
     }
 
     server_addr.sin_family = AF_INET;
@@ -23,13 +23,15 @@ void start_client(const char *server_ip, int server_port) {
     // Convert IPv4 and IPv6 addresses from text to binary form
     if (inet_pton(AF_INET, server_ip, &server_addr.sin_addr) <= 0) {
         perror("Invalid address/ Address not supported");
-        exit(EXIT_FAILURE);
+        close(sock);
+        return;
     }
 
     // Connect to the server
     if (connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
         perror("Connection Failed");
-        exit(EXIT_FAILURE);
+        close(sock);
+        return;
     }
 
     printf("Connected to the server at %s:%d\n", server_ip, server_port);
