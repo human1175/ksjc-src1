@@ -7,6 +7,7 @@
 #include <semaphore.h>
 #include <sys/time.h>
 #include <wiringPi.h>
+#include <signal.h>
 #include "yb_pcb_car.h"
 #include "tracking_sensor.h"
 #include "qr_recognition.h"
