@@ -23,9 +23,10 @@ void print_status(enum Status status) {
 // 서버로부터 받은 Item을 출력하는 함수
 void print_item(Item *item) {
     print_status(item->status);
-    if (item->status == item) {
-        printf("Score: %d\n", item->score);
-    }
+    if (item->status == 1) {  // 올바른 비교로 수정
+    printf("Score: %d\n", item->score);
+}
+
 }
 
 // 서버로부터 받은 Node를 출력하는 함수
