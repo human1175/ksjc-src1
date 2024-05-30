@@ -1,10 +1,7 @@
-all: Server Client QRClient
+all: Server QRClient
 
 Server: server.c server.h
 	gcc -Wall -g server.c -o Server -lpthread
 
-Client: client.c server.h
-	gcc -Wall -g client.c -o Client
-
-QRClient: main.c qr_recognition.cpp client.c server.h
-	g++ -Wall -g main.c qr_recognition.cpp client.c -o QRClient `pkg-config --cflags --libs opencv4`
+QRClient: main.c client.c client.h qr_recognition.cpp qr_recognition.h server.h
+	g++ -Wall -g main.c client.c qr_recognition.cpp -o QRClient `pkg-config --cflags --libs opencv4`
