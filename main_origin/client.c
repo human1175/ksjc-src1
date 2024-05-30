@@ -22,10 +22,9 @@ void print_status(enum Status status) {
 
 // 서버로부터 받은 Item을 출력하는 함수
 void print_item(Item *item) {
-    printf("Item Status: ");
     print_status(item->status);
     if (item->status == item) {
-        printf("Item Score: %d\n", item->score);
+        printf("Score: %d\n", item->score);
     }
 }
 
@@ -35,38 +34,18 @@ void print_node(Node *node) {
     print_item(&(node->item));
 }
 
-// 서버로부터 받은 DGIST의 맵을 출력하는 함수
-void print_map(DGIST *dgist) {
-    printf("========== PRINT MAP ==========\n");
-    for (int i = MAP_ROW-1; i >= 0; i--) {
-        for (int j = 0; j < MAP_COL; j++) {
-            Item item = dgist->map[i][j].item;
-            switch (item.status) {
-                case nothing:
-                    printf("- ");
-                    break;
-                case item:
-                    printf("%d ", item.score);
-                    break;
-                case trap:
-                    printf("x ");
-                    break;
-            }
-        }
-        printf("\n");
-    }
-    printf("========== PRINT DONE ==========\n");
-}
-
 // 서버로부터 받은 DGIST를 출력하는 함수
 void print_dgist(DGIST *dgist) {
-    printf("========== PRINT PLAYERS ==========\n");
+    printf("DGIST - Players Info:\n");
     for (int i = 0; i < MAX_CLIENTS; i++) {
         print_client_info(&(dgist->players[i]));
     }
-    printf("========== PRINT DONE ==========\n");
-    
-    print_map(dgist);
+    printf("DGIST - Map Info:\n");
+    for (int i = 0; i < MAP_ROW; i++) {
+        for (int j = 0; j < MAP_COL; j++) {
+            print_node(&(dgist->map[i][j]));
+        }
+    }
 }
 
 void send_client_action(int sock, int row, int col, int action) {
