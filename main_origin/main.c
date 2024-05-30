@@ -86,19 +86,20 @@ void qr_code_callback(const char* qr_code_data) {
 
     // QR 코드 데이터를 두 자리 숫자로 받아서 한 자리씩 나눕니다.
     if (strlen(qr_code_data) == 2) {
-        char data[3];
-        data[0] = qr_code_data[0];
-        data[1] = ' ';
-        data[2] = qr_code_data[1];
-        data[3] = '\0';
+        // 각 자릿수를 정수로 변환합니다.
+        int digit1 = qr_code_data[0] - '0';
+        int digit2 = qr_code_data[1] - '0';
 
-        // 서버로 QR 코드 데이터를 전송합니다.
-        send(sock, data, strlen(data), 0);
-        printf("QR code data sent to the server: %s\n", data);
+        // 서버로 각 자릿수를 정수로 전송합니다.
+        send(sock, &digit1, sizeof(int), 0);
+        send(sock, &digit2, sizeof(int), 0);
+        
+        printf("QR code data sent to the server: %d, %d\n", digit1, digit2);
     } else {
         printf("Invalid QR code data length: %s\n", qr_code_data);
     }
 }
+
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
