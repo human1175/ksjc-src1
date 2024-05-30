@@ -27,15 +27,26 @@
 # .PHONY: all clean
 
 CC = gcc
-CFLAGS = -Wall
+CFLAGS = -Wall -I.
+LIBS = -lwiringPi -lpthread
+
 TARGET = client
-SRCS = client.c
-OBJS = $(SRCS:.c=.o)
+
+SRCS = client.c yb_pcb_car.c tracking_sensor.c qr_recognition.cpp
+OBJS = $(SRCS:.c=.o) $(SRCS:.cpp=.o)
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -f $(OBJS) $(TARGET)
+
+.PHONY: clean
