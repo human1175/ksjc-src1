@@ -7,7 +7,6 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
-#include "server.h"
 #include "client.h"
 
 #define SERVER_IP "127.0.0.1"
