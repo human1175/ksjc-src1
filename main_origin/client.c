@@ -23,7 +23,7 @@ void print_status(enum Status status) {
 // 서버로부터 받은 Item을 출력하는 함수
 void print_item(Item *item) {
     print_status(item->status);
-    if (item->status == 1) {  // 올바른 비교로 수정
+    if (item->status == item) {  // 올바른 비교로 수정
         printf("Score: %d\n", item->score);
     }
 }
@@ -57,6 +57,29 @@ void print_players(DGIST *dgist) {
         printf("Location: (%d, %d)\n", client.row, client.col);
         printf("Score: %d\n", client.score);
         printf("Bomb: %d\n", client.bomb);
+    }
+    printf("==========PRINT DONE==========\n");
+}
+
+// 맵 정보를 출력하는 함수
+void print_map(DGIST *dgist) {
+    printf("==========PRINT MAP==========\n");
+    for (int i = MAP_ROW - 1; i >= 0; i--) {
+        for (int j = 0; j < MAP_COL; j++) {
+            Item tmpItem = (dgist->map[i][j]).item;
+            switch (tmpItem.status) {
+                case nothing:
+                    printf("- ");
+                    break;
+                case item:
+                    printf("%d ", tmpItem.score);
+                    break;
+                case trap:
+                    printf("x ");
+                    break;
+            }
+        }
+        printf("\n");
     }
     printf("==========PRINT DONE==========\n");
 }
@@ -112,8 +135,9 @@ int main(int argc, char *argv[]) {
         }
 
         // 서버로부터 받은 데이터 처리
-        print_dgist(&dgist);
+        // print_dgist(&dgist);
         print_players(&dgist); // 추가된 함수 호출
+        print_map(&dgist); // 추가된 함수 호출
 
         // 클라이언트 액션 설정 및 서버로 전송
         int row = 1; // 예시로 설정한 행 위치
