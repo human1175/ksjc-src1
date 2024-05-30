@@ -1,6 +1,7 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
+#include <netinet/in.h> // To define struct sockaddr_in
 #include "server.h"  // Include server.h to get the definition of DGIST
 
 #ifdef __cplusplus
