@@ -10,8 +10,6 @@
 #include <signal.h>
 #include "yb_pcb_car.h"
 #include "tracking_sensor.h"
-#include "qr_recognition.h"
-// #include "server.h"
 
 // Constants
 #define MAX_CLIENTS 2
@@ -48,6 +46,7 @@ void handle_sigint(int sig);
 long get_elapsed_time(struct timeval start);
 void visualize_sensor_values(int left1, int left2, int right1, int right2, char* buffer);
 void line_tracer();
+extern "C" void recognize_qr_code_thread();
 
 // Signal handler to stop the motors and clean up
 void handle_sigint(int sig) {
@@ -169,13 +168,13 @@ int main(int argc, char *argv[]) {
 
     setup_gpio();
 
-    if (argc != 3) {
-        fprintf(stderr, "Usage: %s <server_ip> <port>\n", argv[0]);
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <port>\n", argv[0]);
         return 1;
     }
 
-    const char *server_ip = argv[1];
-    int server_port = atoi(argv[2]);
+    const char *server_ip = "127.0.0.1";  // Fixed to localhost
+    int server_port = atoi(argv[1]);
 
     struct sockaddr_in server_addr;
     server_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -207,7 +206,8 @@ int main(int argc, char *argv[]) {
     gettimeofday(&start_time, NULL);
 
     // Start QR code recognition in a separate thread
-    recognize_qr_code_thread();
+    pthread_t qr_thread;
+    pthread_create(&qr_thread, NULL, recognize_qr_code_thread, NULL);
 
     // Start line tracing
     line_tracer();
