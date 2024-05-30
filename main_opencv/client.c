@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <pthread.h>
-#include "server.h"
 
 // Global variables for client
 int client_socket;
