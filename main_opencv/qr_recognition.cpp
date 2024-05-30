@@ -1,24 +1,21 @@
-#include "qr_recognition.h"
 #include <opencv2/opencv.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/objdetect/objdetect.hpp>
+#include <opencv2/objdetect.hpp>
 #include <pthread.h>
 
 using namespace cv;
 using namespace std;
 
-void recognize_qr_code() {
+void* recognize_qr_code(void* arg) {
     VideoCapture cap(0);  // Open the default camera
     if (!cap.isOpened()) {
         printf("Error: Could not open camera.\n");
-        return;
+        return NULL;
     }
 
     // Set camera properties
     cap.set(cv::CAP_PROP_FRAME_WIDTH, 160);  // Set the width of the frames in the video stream.
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, 120); // Set the height of the frames in the video stream.
-    cap.set(cv::CAP_PROP_FPS, 80);           // Set the frame rate to 30 FPS.
+    cap.set(cv::CAP_PROP_FPS, 80);           // Set the frame rate to 80 FPS.
 
     QRCodeDetector qrDecoder = QRCodeDetector();
     Mat frame, bbox, rectifiedImage;
@@ -54,13 +51,9 @@ void recognize_qr_code() {
 
     cap.release();
     destroyAllWindows();
+    return NULL;
 }
 
-extern "C" void recognize_qr_code_thread() {
-    pthread_t qr_thread;
-    pthread_create(&qr_thread, NULL, [](void*) -> void* {
-        recognize_qr_code();
-        return nullptr;
-    }, NULL);
-    pthread_detach(qr_thread);
+extern "C" void* recognize_qr_code_thread(void* arg) {
+    return recognize_qr_code(arg);
 }
