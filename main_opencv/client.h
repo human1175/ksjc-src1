@@ -1,6 +1,8 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
+#include "server.h"  // Include server.h to get the definition of DGIST
+
 #ifdef __cplusplus
 extern "C" {
 #endif
