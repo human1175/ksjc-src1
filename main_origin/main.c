@@ -80,14 +80,8 @@ void line_tracer() {
     }
 }
 
-// QR 코드 인식을 수행하고 결과를 서버로 전송하는 함수
-void* qr_code_thread_func(void* arg) {
-    recognize_qr_code_thread(); // QR 코드 인식 함수 호출
-    return NULL;
-}
-
 // QR 코드 인식 콜백 함수
-extern "C" void qr_code_callback(const char* qr_code_data) {
+void qr_code_callback(const char* qr_code_data) {
     printf("QR Code Recognized: %s\n", qr_code_data);
 
     // 서버로 QR 코드 데이터를 전송합니다.
@@ -144,14 +138,12 @@ int main(int argc, char *argv[]) {
     gettimeofday(&start_time, NULL);
 
     // QR 코드 인식과 전송을 별도의 스레드에서 시작
-    pthread_t qr_thread;
-    pthread_create(&qr_thread, NULL, qr_code_thread_func, NULL);
+    recognize_qr_code_thread(qr_code_callback);
 
     // 라인 트레이서 기능 시작
     line_tracer();
 
     // 이 지점은 line_tracer의 무한 루프 때문에 도달하지 않음
-    pthread_join(qr_thread, NULL);
     close(i2c_file);
     close(sock);
     return 0;

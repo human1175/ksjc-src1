@@ -1,15 +1,14 @@
 #include "qr_recognition.h"
 #include <opencv2/opencv.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/objdetect/objdetect.hpp>
+#include <iostream>
 #include <thread>
 
 using namespace cv;
 using namespace std;
 
-void recognize_qr_code() {
-    VideoCapture cap(0);  // Open the default camera
+// QR 코드 인식 함수
+void recognize_qr_code(qr_code_callback_t callback) {
+    VideoCapture cap(0);
     if (!cap.isOpened()) {
         printf("Error: Could not open camera.\n");
         return;
@@ -41,6 +40,11 @@ void recognize_qr_code() {
         if (!data.empty()) {
             printf("\n============================== QR decoded Data: %s ==============================\n\n", data.c_str());
 
+            // 콜백 함수 호출하여 디코딩된 데이터를 전달
+            if (callback) {
+                callback(data.c_str());
+            }
+
             int n = bbox.rows;
             for (int i = 0; i < n; i++) {
                 line(frame, Point2i(bbox.at<float>(i, 0), bbox.at<float>(i, 1)),
@@ -64,6 +68,7 @@ void recognize_qr_code() {
     destroyAllWindows();
 }
 
-extern "C" void recognize_qr_code_thread() {
-    std::thread(recognize_qr_code).detach();
+// QR 코드 인식 스레드 시작 함수
+extern "C" void recognize_qr_code_thread(qr_code_callback_t callback) {
+    std::thread(recognize_qr_code, callback).detach();
 }
