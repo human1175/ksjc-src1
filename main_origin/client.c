@@ -37,7 +37,7 @@ void print_node(Node *node) {
 
 // 서버로부터 받은 DGIST를 출력하는 함수
 void print_dgist(DGIST *dgist) {
-    printf("DGIST - Players Info:\n");
+    printf("DGIST - Players Info:\n"); 
     for (int i = 0; i < MAX_CLIENTS; i++) {
         print_client_info(&(dgist->players[i]));
     }
@@ -47,6 +47,20 @@ void print_dgist(DGIST *dgist) {
             print_node(&(dgist->map[i][j]));
         }
     }
+}
+
+void printPlayer(DGIST *dgist){
+
+	client_info client;
+	printf("==========PRINT PLYAERS==========\n");
+	for(int i=0; i < MAX_CLIENTS; i++){
+		client = dgist->players[i];
+		printf("++++++++++Player %d++++++++++\n",i+1);
+		printf("Location: (%d,%d)\n",client.row, client.col);
+		printf("Score: %d\n",client.score);
+		printf("Bomb: %d\n",client.bomb);
+	}
+	printf("==========PRINT DONE==========\n");
 }
 
 void send_client_action(int sock, int row, int col, int action) {
