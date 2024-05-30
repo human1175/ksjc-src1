@@ -24,9 +24,8 @@ void print_status(enum Status status) {
 void print_item(Item *item) {
     print_status(item->status);
     if (item->status == 1) {  // 올바른 비교로 수정
-    printf("Score: %d\n", item->score);
-}
-
+        printf("Score: %d\n", item->score);
+    }
 }
 
 // 서버로부터 받은 Node를 출력하는 함수
@@ -37,7 +36,7 @@ void print_node(Node *node) {
 
 // 서버로부터 받은 DGIST를 출력하는 함수
 void print_dgist(DGIST *dgist) {
-    printf("DGIST - Players Info:\n"); 
+    printf("DGIST - Players Info:\n");
     for (int i = 0; i < MAX_CLIENTS; i++) {
         print_client_info(&(dgist->players[i]));
     }
@@ -49,18 +48,17 @@ void print_dgist(DGIST *dgist) {
     }
 }
 
-void printPlayer(DGIST *dgist){
-
-	client_info client;
-	printf("==========PRINT PLYAERS==========\n");
-	for(int i=0; i < MAX_CLIENTS; i++){
-		client = dgist->players[i];
-		printf("++++++++++Player %d++++++++++\n",i+1);
-		printf("Location: (%d,%d)\n",client.row, client.col);
-		printf("Score: %d\n",client.score);
-		printf("Bomb: %d\n",client.bomb);
-	}
-	printf("==========PRINT DONE==========\n");
+// 서버로부터 받은 DGIST 구조체의 players 정보를 출력하는 함수
+void print_players(DGIST *dgist) {
+    printf("==========PRINT PLAYERS==========\n");
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        client_info client = dgist->players[i];
+        printf("++++++++++Player %d++++++++++\n", i + 1);
+        printf("Location: (%d, %d)\n", client.row, client.col);
+        printf("Score: %d\n", client.score);
+        printf("Bomb: %d\n", client.bomb);
+    }
+    printf("==========PRINT DONE==========\n");
 }
 
 void send_client_action(int sock, int row, int col, int action) {
@@ -115,6 +113,7 @@ int main(int argc, char *argv[]) {
 
         // 서버로부터 받은 데이터 처리
         print_dgist(&dgist);
+        print_players(&dgist); // 추가된 함수 호출
 
         // 클라이언트 액션 설정 및 서버로 전송
         int row = 1; // 예시로 설정한 행 위치
