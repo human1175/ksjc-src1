@@ -1,7 +1,7 @@
-all: ClientTest
+all: Server Client
 
-ClientTest: main.c client.c client.h server.h
-	gcc -Wall -g main.c client.c -o ClientTest
+Server: server.c
+	gcc -Wall -g server.c -o Server -lpthread
 
-clean:
-	rm -f ClientTest
+Client: client.c
+	gcc -Wall -g client.c -o Client
