@@ -10,7 +10,7 @@
 #include "yb_pcb_car.h"
 #include "tracking_sensor.h"
 #include "qr_recognition.h"
-#include "server.h"
+// #include "server.h"
 
 // Constants
 #define MAX_CLIENTS 2
