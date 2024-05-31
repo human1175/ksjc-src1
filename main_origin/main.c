@@ -12,7 +12,7 @@
 #include "qr_recognition.h"
 #include "server.h"
 
-#define SERVER_IP "127.0.0.1" // 고정된 서버 IP 주소
+#define SERVER_IP "10.150.4.149" // 고정된 서버 IP 주소
 
 int i2c_file;  // Global variable to store the I2C file descriptor
 struct timeval start_time;  // Start time of the program
