@@ -152,9 +152,10 @@ void* receive_from_server(void* arg) {
 //     }
 // }
 
-void send_client_action(int sock, int row, int col, int action) {
+// 클라이언트의 위치와 행동을 서버로 전송하는 함수
+void send_client_action(int sock, int row, int col, Action action) {
     ClientAction client_action = {row, col, action};
-    send(sock, &client_action, sizeof(int), 0);
+    send(sock, &client_action, sizeof(ClientAction), 0);
     printf("Client action sent: (%d, %d) Action: %d\n", row, col, action);
 }
 
@@ -167,7 +168,7 @@ void qr_code_callback(const char* qr_code_data) {
         // 각 자릿수를 정수로 변환합니다.
         int row = qr_code_data[0] - '0';  // 첫 번째 자릿수를 행으로 사용
         int col = qr_code_data[1] - '0';  // 두 번째 자릿수를 열로 사용
-        int action = 1;  // 폭탄 설치
+        Action action = ACTION_PLACE_BOMB;  // 폭탄 설치
 
         // 서버로 위치와 지뢰 정보 전송
         send_client_action(sock, row, col, action);
