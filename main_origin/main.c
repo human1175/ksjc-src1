@@ -154,7 +154,7 @@ void* receive_from_server(void* arg) {
 
 void send_client_action(int sock, int row, int col, int action) {
     ClientAction client_action = {row, col, action};
-    send(sock, &client_action, sizeof(ClientAction), 0);
+    send(sock, &client_action, sizeof(int), 0);
     printf("Client action sent: (%d, %d) Action: %d\n", row, col, action);
 }
 
