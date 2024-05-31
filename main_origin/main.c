@@ -133,35 +133,48 @@ void* receive_from_server(void* arg) {
 }
 
 // QR 코드 인식 콜백 함수
+// void qr_code_callback(const char* qr_code_data) {
+//     printf("QR Code Recognized: %s\n", qr_code_data);
+
+//     // QR 코드 데이터를 두 자리 숫자로 받아서 한 자리씩 나눕니다.
+//     if (strlen(qr_code_data) == 2) {
+//         // 각 자릿수를 정수로 변환합니다.
+//         int digit1 = qr_code_data[0] - '0';
+//         int digit2 = qr_code_data[1] - '0';
+
+//         // 서버로 각 자릿수를 정수로 전송합니다.
+//         send(sock, &digit1, sizeof(int), 0);
+//         send(sock, &digit2, sizeof(int), 0);
+        
+//         printf("QR code data sent to the server: %d, %d\n", digit1, digit2);
+//     } else {
+//         printf("Invalid QR code data length: %s\n", qr_code_data);
+//     }
+// }
+
+// QR 코드 인식 콜백 함수
 void qr_code_callback(const char* qr_code_data) {
     printf("QR Code Recognized: %s\n", qr_code_data);
 
     // QR 코드 데이터를 두 자리 숫자로 받아서 한 자리씩 나눕니다.
     if (strlen(qr_code_data) == 2) {
         // 각 자릿수를 정수로 변환합니다.
-        int digit1 = qr_code_data[0] - '0';
-        int digit2 = qr_code_data[1] - '0';
+        int row = qr_code_data[0] - '0';  // 첫 번째 자릿수를 행으로 사용
+        int col = qr_code_data[1] - '0';  // 두 번째 자릿수를 열로 사용
+        int action = 1;  // 폭탄 설치
 
-        // 서버로 각 자릿수를 정수로 전송합니다.
-        send(sock, &digit1, sizeof(int), 0);
-        send(sock, &digit2, sizeof(int), 0);
-
-        // 서버로 폭탄 설치 명령 전송
-        send_bomb_command(sock, digit1, digit2);
-        
-        printf("QR code data sent to the server: %d, %d\n", digit1, digit2);
+        // 서버로 위치와 지뢰 정보 전송
+        send_client_action(sock, row, col, action);
+        printf("QR code data sent to the server: Row: %d, Col: %d, Action: %d\n", row, col, action);
     } else {
         printf("Invalid QR code data length: %s\n", qr_code_data);
     }
 }
 
-// Function to send a bomb placement command to the server
-void send_bomb_command(int sock, int row, int col) {
-    const char* command = "BOMB";
-    send(sock, command, strlen(command), 0);
-    send(sock, &row, sizeof(int), 0);
-    send(sock, &col, sizeof(int), 0);
-    printf("Bomb placement command sent: (%d, %d)\n", row, col);
+void send_client_action(int sock, int row, int col, int action) {
+    ClientAction client_action = {row, col, action};
+    send(sock, &client_action, sizeof(ClientAction), 0);
+    printf("Client action sent: (%d, %d) Action: %d\n", row, col, action);
 }
 
 // Function to read sensors and control the car accordingly
