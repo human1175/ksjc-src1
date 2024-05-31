@@ -145,9 +145,9 @@ void qr_code_callback(const char* qr_code_data) {
         // 서버로 각 자릿수를 정수로 전송합니다.
         send(sock, &digit1, sizeof(int), 0);
         send(sock, &digit2, sizeof(int), 0);
-        
+
         // 서버로 폭탄 설치 명령 전송
-        send_bomb_command(sock, row, col);
+        send_bomb_command(sock, digit1, digit2);
         
         printf("QR code data sent to the server: %d, %d\n", digit1, digit2);
     } else {
