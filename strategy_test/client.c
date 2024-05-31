@@ -64,8 +64,8 @@ void print_players(DGIST *dgist) {
 // 맵 정보를 출력하는 함수
 void print_map(DGIST *dgist) {
     printf("==========PRINT MAP==========\n");
-	for (int j = 0; j < MAP_COL; j++) {
-		for (int i = 0; i < MAP_ROW; i++) {
+	for (int i = 0; i < MAP_ROW; i++) {
+		for (int j = 0; j < MAP_COL; j++) {
             Item tmpItem = (dgist->map[i][j]).item;
             switch (tmpItem.status) {
                 case nothing:
