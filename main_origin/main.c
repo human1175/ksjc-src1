@@ -146,10 +146,22 @@ void qr_code_callback(const char* qr_code_data) {
         send(sock, &digit1, sizeof(int), 0);
         send(sock, &digit2, sizeof(int), 0);
         
+        // 서버로 폭탄 설치 명령 전송
+        send_bomb_command(sock, row, col);
+        
         printf("QR code data sent to the server: %d, %d\n", digit1, digit2);
     } else {
         printf("Invalid QR code data length: %s\n", qr_code_data);
     }
+}
+
+// Function to send a bomb placement command to the server
+void send_bomb_command(int sock, int row, int col) {
+    const char* command = "BOMB";
+    send(sock, command, strlen(command), 0);
+    send(sock, &row, sizeof(int), 0);
+    send(sock, &col, sizeof(int), 0);
+    printf("Bomb placement command sent: (%d, %d)\n", row, col);
 }
 
 // Function to read sensors and control the car accordingly
