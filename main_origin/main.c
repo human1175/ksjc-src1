@@ -152,6 +152,12 @@ void* receive_from_server(void* arg) {
 //     }
 // }
 
+void send_client_action(int sock, int row, int col, int action) {
+    ClientAction client_action = {row, col, action};
+    send(sock, &client_action, sizeof(ClientAction), 0);
+    printf("Client action sent: (%d, %d) Action: %d\n", row, col, action);
+}
+
 // QR 코드 인식 콜백 함수
 void qr_code_callback(const char* qr_code_data) {
     printf("QR Code Recognized: %s\n", qr_code_data);
@@ -169,12 +175,6 @@ void qr_code_callback(const char* qr_code_data) {
     } else {
         printf("Invalid QR code data length: %s\n", qr_code_data);
     }
-}
-
-void send_client_action(int sock, int row, int col, int action) {
-    ClientAction client_action = {row, col, action};
-    send(sock, &client_action, sizeof(ClientAction), 0);
-    printf("Client action sent: (%d, %d) Action: %d\n", row, col, action);
 }
 
 // Function to read sensors and control the car accordingly
