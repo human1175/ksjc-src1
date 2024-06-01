@@ -229,7 +229,7 @@ void line_tracer() {
             if (print_option) {
                 printf("[%ld ms] Moving straight\n", elapsed_time);
             }
-            Car_Run(i2c_file, 120, 120);
+            Car_Run(i2c_file, 70, 70);
         }
 
         usleep(10000);  // 10 milliseconds delay to prevent excessive CPU usage
