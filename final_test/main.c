@@ -191,6 +191,9 @@ void line_tracer() {
 
         bool print_option = 0;
 
+        // 여기에 path planning을 통해 결정된 우회전, 좌회전, 직진 여부를 처리하는 조건문을 넣어야함 // 
+        // 조건문의 경우에는 직진은 아래 코드의 직진 부분을, 좌회전은 intersection 감지 및 left결과인 경우 sharp turn을 하게, 우회전도 이와 비슷하게 sharp turn을 하도록 구현하면 됌 // 
+
         if (left1_value == LOW && right2_value == LOW) {
             if (print_option) {
                 printf("[%ld ms] Turning left (sharp)\n", elapsed_time);
