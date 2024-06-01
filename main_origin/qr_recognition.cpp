@@ -15,9 +15,9 @@ void recognize_qr_code(qr_code_callback_t callback) {
     }
 
     // Set camera properties
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, 160);  // Set the width of the frames in the video stream.
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 120); // Set the height of the frames in the video stream.
-    cap.set(cv::CAP_PROP_FPS, 80);           // Set the frame rate to 80 FPS.
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, 320);  // Set the width of the frames in the video stream.
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 240); // Set the height of the frames in the video stream.
+    cap.set(cv::CAP_PROP_FPS, 60);           // Set the frame rate to 80 FPS.
 
     QRCodeDetector qrDecoder = QRCodeDetector();
     Mat frame, gray_frame, equalized_frame, bbox, rectifiedImage;
