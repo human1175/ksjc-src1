@@ -19,11 +19,6 @@ int i2c_file;  // Global variable to store the I2C file descriptor
 struct timeval start_time;  // Start time of the program
 int sock;  // 소켓 파일 디스크립터
 
-int bomb_row = -1;  // 전역 변수로 폭탄을 설치할 행을 저장
-int bomb_col = -1;  // 전역 변수로 폭탄을 설치할 열을 저장
-pthread_mutex_t bomb_mutex;  // mutex for synchronizing access to bomb_row and bomb_col
-
-
 // Signal handler to stop the motors and clean up
 void handle_sigint(int sig) {
     Car_Stop(i2c_file);
@@ -174,16 +169,7 @@ void qr_code_callback(const char* qr_code_data) {
         // 각 자릿수를 정수로 변환합니다.
         int row = qr_code_data[0] - '0';  // 첫 번째 자릿수를 행으로 사용
         int col = qr_code_data[1] - '0';  // 두 번째 자릿수를 열로 사용
-        Action action = setBomb;  // 폭탄 설치
-
-        // mutex를 사용하여 전역 변수 접근
-        pthread_mutex_lock(&bomb_mutex);
-        if (row == bomb_row && col == bomb_col) {
-            action = setBomb;  // 폭탄 설치
-        } else {
-            action = move;  // 이동
-        }
-        pthread_mutex_unlock(&bomb_mutex);
+        Action action = setBomb(row, col);  // 폭탄 설치
 
         // 서버로 위치와 지뢰 정보 전송
         send_client_action(sock, row, col, action);
@@ -207,12 +193,7 @@ void line_tracer() {
 
         // 여기에 path planning을 통해 결정된 우회전, 좌회전, 직진 여부를 처리하는 조건문을 넣어야함 // 
         // 조건문의 경우에는 직진은 아래 코드의 직진 부분을, 좌회전은 intersection 감지 및 left결과인 경우 sharp turn을 하게, 우회전도 이와 비슷하게 sharp turn을 하도록 구현하면 됌 // 
-
-        // 폭탄 설치할 노드의 위치가 결정나면 전역변수 bomb_row, bomb_col 아래 주석 코드와 같이 설정해줘야함 // 
-        // pthread_mutex_lock(&bomb_mutex);
-        // bomb_row = 결정된 row결과;
-        // bomb_col = 결정된 col결과;
-        // pthread_mutex_unlock(&bomb_mutex);
+        // 형이 한 조건문
 
         if (left1_value == LOW && right2_value == LOW) {
             if (print_option) {
