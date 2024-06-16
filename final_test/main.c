@@ -167,7 +167,7 @@ void set_players(DGIST* dgist) {
 
 // graph 초기화
 void initialize_graph(DGIST* dgist, NodeInfo graph[MAP_ROW][MAP_COL], client_info* opponent) {
-    
+    printf("enter initialize_graph\n");
     double total2b[MAP_ROW][MAP_COL];
     for (int i = 0; i < MAP_ROW; i++) {
         for (int j = 0; j < MAP_COL; j++) {
@@ -191,7 +191,7 @@ void initialize_graph(DGIST* dgist, NodeInfo graph[MAP_ROW][MAP_COL], client_inf
             if (i - 1 >= 0) total_benefit += graph[i - 1][j].benefit; // North
             if (i + 1 < MAP_ROW) total_benefit += graph[i + 1][j].benefit; // South
             if (j - 1 >= 0) total_benefit += graph[i][j - 1].benefit; // West
-            if (j + 1 >= 0) total_benefit += graph[i][j + 1].benefit; // East
+            if (j + 1 < MAP_COL) total_benefit += graph[i][j + 1].benefit; // East
             total2b[i][j] = 0.5 * total_benefit;
         }
     }
@@ -205,20 +205,25 @@ void initialize_graph(DGIST* dgist, NodeInfo graph[MAP_ROW][MAP_COL], client_inf
     // opponent와 가까운 node에 cost 부여 (내가 임의로 가까울수록 높은 cost 부여하게 만들었음)
     for (int k = 1; k < 3; k++) {
         if (opponent->row + k < MAP_ROW) graph[opponent->row + k][opponent->col].cost = 3 - k;
-        if (opponent->col + k < MAP_COL) graph[opponent->row - k][opponent->col].cost = 3 - k;
-        if (opponent->row - k >= 0) graph[opponent->row][opponent->col + k].cost = 3 - k;
+        if (opponent->col + k < MAP_COL) graph[opponent->row][opponent->col + k].cost = 3 - k;
+        if (opponent->row - k >= 0) graph[opponent->row - k][opponent->col].cost = 3 - k;
         if (opponent->col - k >= 0) graph[opponent->row][opponent->col - k].cost = 3 - k;
     }
     if (opponent->row + 1 < MAP_ROW && opponent->col + 1 < MAP_COL) graph[opponent->row + 1][opponent->col + 1].cost = 1;
-    if (opponent->row - 1 >= 0 && opponent->col - 1 >= 0) graph[opponent->row + 1][opponent->col + 1].cost = 1;
+    if (opponent->row - 1 >= 0 && opponent->col - 1 >= 0) graph[opponent->row - 1][opponent->col - 1].cost = 1;
+    if (opponent->row - 1 >= 0 && opponent->col + 1 < MAP_COL) graph[opponent->row - 1][opponent->col + 1].cost = 1;
+    if (opponent->row + 1 < MAP_ROW && opponent->col - 1 >= 0) graph[opponent->row + 1][opponent->col - 1].cost = 1;
+    printf("out initialize_graph\n");
 }
 
 void calculate_move_cost(int current_row, int current_col, NodeInfo graph[MAP_ROW][MAP_COL]) {
+    printf("enter calculate_move_cost\n");
     for (int i = 0; i < MAP_ROW; i++) {
         for (int j = 0; j < MAP_COL; j++) {
             graph[i][j].cost += abs(current_row - i) + abs(current_col - j);
         }
     }
+    printf("out calculate_move_cost\n");
 }
 
 // 구조체 정의: 최소값과 인덱스를 저장
@@ -269,6 +274,7 @@ double calculate_final_cost(int i_cost, int i_benefit) {
 
 // 최적의 path with Dijkstra's algorithm
 int find_optimal_path(DGIST* dgist, NodeInfo graph[MAP_ROW][MAP_COL]) {
+    printf("enter find_optimal_path");
     double total[MAP_ROW][MAP_COL];
 
     // 이전 노드 정보 초기화
@@ -285,7 +291,7 @@ int find_optimal_path(DGIST* dgist, NodeInfo graph[MAP_ROW][MAP_COL]) {
             total[i][j] = calculate_final_cost(graph[i][j].cost, graph[i][j].benefit);
         }
     }
-
+    printf("여기요");
     MinValueIndex minValueIndex = findMinValueAndIndex(total);
     int destination_node_row = minValueIndex.min_row;
     int destination_node_col = minValueIndex.min_col;
@@ -379,7 +385,7 @@ int find_optimal_path(DGIST* dgist, NodeInfo graph[MAP_ROW][MAP_COL]) {
     } else {
         handle = 2;
     }
-
+    printf("out find_optimal_path");
     return handle;
 }
 
@@ -425,12 +431,13 @@ void trace_optimal_path(NodeInfo graph[MAP_ROW][MAP_COL], int start_row, int sta
 }
 
 int execute_strategy(DGIST* dgist, int sock) {
-
+    printf("enter execute_strategy\n");
     int current_row = player.row;
     int current_col = player.col;
     NodeInfo graph[MAP_ROW][MAP_COL];
     initialize_graph(dgist, graph, &opponent);
     calculate_move_cost(current_row, current_col, graph);
+    printf("out execute_strategy\n");
     return find_optimal_path(dgist, graph);
     /*
     // For demonstration, assume we want to move to the bottom-right corner
@@ -442,6 +449,7 @@ int execute_strategy(DGIST* dgist, int sock) {
     // Example of sending the action to the server
     send_client_action(sock, target_row, target_col, move);
     */
+    
 }
 //여기까지
 int leave_trap(int row_dst, int col_dst) {
@@ -662,24 +670,26 @@ void line_tracer() {
         // bomb_row = 결정된 row결과;
         // bomb_col = 결정된 col결과;
         // pthread_mutex_unlock(&bomb_mutex);
-
-        if (execute_strategy(&dgist, sock) == 0) {
-            if (left1_value == LOW) {
+        //int ES = execute_strategy(&dgist, sock); //나중에 ㅏㄹ리기
+        int ES = 2;
+        if (ES == 0) {
+            if (left1_value == LOW && left2_value == LOW) {
                 if (print_option) {
                     printf("[%ld ms] Turning left (sharp)\n", elapsed_time);
                 }
                 Car_Spin_Left(i2c_file, 30, 70);
-                usleep(200000);  // 0.2 seconds
+                usleep(1000000);  // 0.2 seconds
             }
-        } else if (execute_strategy(&dgist, sock) == 2) {
-            if (right2_value == LOW) {
+        } else if (ES == 2) {
+            if (right2_value == LOW && right1_value == LOW) {
                 if (print_option) {
                     printf("[%ld ms] Turning right (sharp)\n", elapsed_time);
                 }
                 Car_Spin_Right(i2c_file, 70, 30);
-                usleep(200000);  // 0.2 seconds
+                usleep(1400000);  // 0.2 seconds
             }
-        } else if (left1_value == LOW) {
+        }
+        if (left1_value == LOW) {
             if (print_option) {
                 printf("[%ld ms] Turning left\n", elapsed_time);
             }
@@ -785,3 +795,4 @@ int main(int argc, char *argv[]) {
     pthread_mutex_destroy(&bomb_mutex);  // Destroy the mutex
     return 0;
 }
+
