@@ -12,7 +12,7 @@
 #include "qr_recognition.h"
 #include "server.h"
 
-#define SERVER_IP "192.168.0.77"
+// #define SERVER_IP "10.150.4.149" // 고정된 서버 IP 주소
 #define SERVER_IP "127.0.0.1"
 
 int player_number = 0;
@@ -104,8 +104,8 @@ void print_players(DGIST *dgist) {
 // 맵 정보를 출력하는 함수
 void print_map(DGIST *dgist) {
     printf("==========PRINT MAP==========\n");
-   for (int i = 0; i < MAP_ROW; i++) {
-      for (int j = 0; j < MAP_COL; j++) {
+	for (int i = 0; i < MAP_ROW; i++) {
+		for (int j = 0; j < MAP_COL; j++) {
             Item tmpItem = (dgist->map[i][j]).item;
             switch (tmpItem.status) {
                 case nothing:
@@ -124,10 +124,10 @@ void print_map(DGIST *dgist) {
     printf("==========PRINT DONE==========\n");
 }
 
-// struct node_c{
-//     int row;
-//     int col;
-// };
+struct node_c{
+    int row;
+    int col;
+};
 
 struct node_c {
     int row;
@@ -136,9 +136,9 @@ struct node_c {
 };
 
 node_c find_best_node(DGIST *dgist, int current_row, int current_col) {
-    int min_value = 0;
+    int min_value = INT_MAX;
     node_c best_node = {current_row, current_col, min_value}; // 초기값을 현재 노드로 설정
-    
+
     // 상하좌우 노드 좌표
     int directions[4][2] = {
         {current_row - 1, current_col}, // 상
@@ -157,7 +157,7 @@ node_c find_best_node(DGIST *dgist, int current_row, int current_col) {
             Item item = dgist->map[row][col].item;
             int value = 0;
 
-            if (item.status == 1) {
+            if (item.status == item) {
                 value = item.score;
             } else if (item.status == trap) {
                 value = -8;
@@ -175,36 +175,19 @@ node_c find_best_node(DGIST *dgist, int current_row, int current_col) {
 }
 
 int execute_strategy(DGIST *dgist) {
-    // printf("excute_strategy!\n");
+    printf("excute_strategy!\n");
     client_info client = dgist->players[player_number];
     
     int current_row = client.row;
     int current_col = client.col;
 
-    
     node_c best_node = find_best_node(dgist, current_row, current_col);
-    int destination_node_row = best_node.row;
-    int destination_node_col = best_node.col;
+
     // 여기서 best_node로 이동하는 로직을 추가하거나 반환값을 활용
     // printf("Best node to move: (%d, %d) with value: %d\n", best_node.row, best_node.col, best_node.value);
 
-    int svr_row = client.row;
-    int svr_col = client.col;
 
-    int drc = 0; //1,2,3,4 각각 북동남서(시계방향)
-    int drc2 = 0; //1,2,3,4 각각 북동남서(시계방향) 초기화
 
-    //현재 이전 위치를 저장하고 현재 위치를 서버에서 업데이트한다.
-    if (cur_row != svr_row) { //cycle이 돌 때마다 업데이트하면 pre와 cur이 거의 동일하게 갈 거기 때문에 변화한 경우에만 업데이트한다.
-        pre_row = cur_row;
-        cur_row = svr_row;
-    }
-    if (cur_col != svr_col) {
-        pre_col = cur_col;
-        cur_col = svr_col;
-    }
-
-    /*
     // 적절한 동작을 반환 (예: 0 - 좌회전, 1 - 직진, 2 - 우회전)
     if (best_node.row < current_row) {
         return 0; // 상
@@ -215,79 +198,8 @@ int execute_strategy(DGIST *dgist) {
     } else if (best_node.col > current_col) {
         return 2; // 우
     }
-    */
-    
-    //현재 방향을 구한다.
-    if (cur_row - pre_row > 0) {//북
-        drc = 3;
-    }
-    if (cur_row - pre_row < 0) {//동
-        drc = 1;
-    }
-    if (cur_col - pre_col > 0) {//남
-        drc = 2;
-    }
-    if (cur_col - pre_col < 0) {//서
-        drc = 4;
-    }
 
-    int row_diff = destination_node_row - client.row;
-    int col_diff = destination_node_col - client.col;
-    int directions[2]; //내가 움직일 방향(최종적으로는 [1,0], [0,-1] 뭐 이런식으로 나올거임.)
-    if (row_diff > 0) {
-        directions[0] = 1;
-    } else if (row_diff < 0) {
-        directions[0] = -1;
-    } else {
-        directions[0] = 0;
-    }
-
-    if (col_diff > 0) {
-        directions[1] = 1;
-    } else if (col_diff < 0) {
-        directions[1] = -1;
-    } else {
-        directions[1] = 0;
-    }
-
-    // if (directions[0] != 0 && directions[1] != 0) {
-    //     if (total[client.row + directions[0]][client.col] < total[client.row][client.col + directions[1]]) {
-    //         directions[1] = 0;
-    //     } else {
-    //         directions[0] = 0;
-    //     }
-    // }
-
-    for (int i = 0; i < 2; i++) {
-        if (directions[i] != 0) {
-            if (i == 0) {
-                if (directions[0] > 0) {
-                    drc2 = 1;
-                } else {
-                    drc2 = 3;
-                }
-            } else if (i == 1) {
-                if (directions[1] > 0) {
-                    drc2 = 2;
-                } else {
-                    drc2 = 4;
-                }
-            }
-        }
-    }
-
-    int handle; //좌회전0 직진1 우회전2
-    if (drc == drc2) {
-        handle = 1;
-    } else if ((drc == 1 && drc2 == 2) || (drc == 2 && drc2 == 3) || (drc == 3 && drc2 == 4) || (drc == 4 && drc2 == 1)) {
-        handle = 2;
-    } else if ((drc == 1 && drc2 == 4) || (drc == 2 && drc2 == 1) || (drc == 3 && drc2 == 2) || (drc == 4 && drc2 == 3)) {
-        handle = 0;
-    } else {
-        handle = 1;
-    }
-    // printf("out find_optimal_path");
-    return handle;
+    return 1; // 기본적으로 직진
 }
 
 // 서버로부터 실시간으로 값을 받아와서 출력하는 함수
@@ -375,7 +287,7 @@ void line_tracer() {
 
         long elapsed_time = get_elapsed_time(start_time);
 
-        bool print_option = 1;
+        bool print_option = 0;
 
         // 여기에 path planning을 통해 결정된 우회전, 좌회전, 직진 여부를 처리하는 조건문을 넣어야함 // 
         // 조건문의 경우에는 직진은 아래 코드의 직진 부분을, 좌회전은 intersection 감지 및 left결과인 경우 sharp turn을 하게, 우회전도 이와 비슷하게 sharp turn을 하도록 구현하면 됌 // 
@@ -386,12 +298,8 @@ void line_tracer() {
         // bomb_col = 결정된 col결과;
         // pthread_mutex_unlock(&bomb_mutex);
 
-        int ES = execute_strategy(&dgist);
-        // int ES = 2;
+        int ES = 2;
         if (ES == 0) {
-            if (print_option) {
-                printf("================== We want LEFT! ==================\n");
-            }
             if (left1_value == LOW && left2_value == LOW) {
                 if (print_option) {
                     printf("[%ld ms] Turning left (sharp)\n", elapsed_time);
@@ -399,46 +307,42 @@ void line_tracer() {
                 Car_Spin_Left(i2c_file, 30, 70);
                 usleep(1000000);  // 0.2 seconds
             }
-        } 
-        else if (ES == 2) {
-            if (print_option) {
-                printf("================== We want RIGHT! ==================\n");
-            }
+        } else if (ES == 2) {
             if (right2_value == LOW && right1_value == LOW) {
                 if (print_option) {
                     printf("[%ld ms] Turning right (sharp)\n", elapsed_time);
                 }
-                Car_Spin_Right(i2c_file, 70, 35);
-                usleep(1150000);  // 0.2 seconds
+                Car_Spin_Right(i2c_file, 70, 30);
+                usleep(1500000);  // 0.2 seconds
             }
         }
         if (left1_value == LOW) {
             if (print_option) {
-                // printf("[%ld ms] Turning left\n", elapsed_time);
+                printf("[%ld ms] Turning left\n", elapsed_time);
             }
             Car_Spin_Left(i2c_file, 70, 70);
             usleep(50000);  // 0.05 seconds
         } else if (right2_value == LOW) {
             if (print_option) {
-                // printf("[%ld ms] Turning right\n", elapsed_time);
+                printf("[%ld ms] Turning right\n", elapsed_time);
             }
             Car_Spin_Right(i2c_file, 70, 70);
             usleep(50000);  // 0.05 seconds
         } else if (left2_value == LOW && right1_value == HIGH) {
             if (print_option) {
-                // printf("[%ld ms] Adjusting left\n", elapsed_time);
+                printf("[%ld ms] Adjusting left\n", elapsed_time);
             }
             Car_Spin_Left(i2c_file, 60, 60);
             usleep(20000);  // 0.02 seconds
         } else if (left2_value == HIGH && right1_value == LOW) {
             if (print_option) {
-                // printf("[%ld ms] Adjusting right\n", elapsed_time);
+                printf("[%ld ms] Adjusting right\n", elapsed_time);
             }
             Car_Spin_Right(i2c_file, 60, 60);
             usleep(20000);  // 0.02 seconds
         } else if (left2_value == LOW && right1_value == LOW) {
             if (print_option) {
-                // printf("[%ld ms] Moving straight\n", elapsed_time);
+                printf("[%ld ms] Moving straight\n", elapsed_time);
             }
             Car_Run(i2c_file, 80, 80);
         }
