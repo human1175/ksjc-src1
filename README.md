@@ -9,7 +9,7 @@
 </br>
 </br>
 
-# <div align=center>  final_test의 소스코드들이 실제 데모에서 사용된 최종 코드입니다 !! </div>
+# <div align=center>  final_test의 소스코드들이 실제 데모에서 사용된 최종 코드입니다 </div>
 
 </br>
 </br>
